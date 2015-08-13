@@ -67,20 +67,9 @@
                 %i.fa.fa-cog
                 %span Settings
         #content.tab-pane.active
-          .cms-form-well
-            =form.inputs do
-              -@non_meta_content_attributes.each do |content_attribute|
-                /content_input is defined in config/initializers/formtastic_ext.rb
-                =form.content_input content_attribute
+          =render 'content_attributes', form: form
         #meta.tab-pane
-          .cms-form-well
-            =form.inputs do
-              =form.input :meta_title, hint: 'Meta title: aim for 70 characters'
-              =form.input :meta_description, hint: 'Meta short description: Brief summary of the page, aim for 70 characters'
-              =form.input :meta_keywords, hint: 'Meta keywords: comma separated'
-              =form.input :meta_image, as: :image, hint: 'Meta images for facebook: Minimum size 600px x 315px, recommended size 1200px x 630px'
-              -unless @content_package.viewless?
-                =render 'permalinks', content_package: @content_package, form: form
+          =render 'meta_inputs', form: form
         -if Pig::configuration.tags_feature
           #tags.tab-pane
             .cms-form-well
@@ -207,7 +196,3 @@
               %label.col-primary Content requested by
               %p
                 =@content_package.requested_by.try(:full_name)
-            / #discussion.tab-pane.cms-well
-            /   =render("discussion")
-            / #content-scorecard.tab-pane.cms-well
-            /   Not defined yet

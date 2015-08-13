@@ -25,6 +25,19 @@ module Pig
       content_package.define_singleton_method("remove_#{@slug}=") do |value|
         send("#{slug}_uid=", nil) if value == '1'
       end
+
+      content_package.define_singleton_method("#{@slug}_alt") do
+        content_package.json_content['content_chunks'] ||= {}
+        content_package.json_content['content_chunks'][slug] ||= {}
+        content_package.json_content['content_chunks'][slug]['alt'] || ''
+      end
+
+      content_package.define_singleton_method("#{@slug}_alt=") do |value|
+        content_package.json_content['content_chunks'] ||= {}
+        content_package.json_content['content_chunks'][slug] ||= {}
+        content_package.json_content['content_chunks'][slug]['alt'] = value
+        content_package.json_content_will_change! if Rails.version.to_f < 4.2
+      end
     end
 
     def get(content_package)

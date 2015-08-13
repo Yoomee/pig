@@ -17,11 +17,12 @@ module Pig
       end
 
       def download_image_if_missing(image)
+        return unless Rails.env.development?
         begin
           image.path
         rescue Dragonfly::Job::Fetch::NotFound => e
           image_url = "#{download_image_url_prefix}#{image.url}"
-          image_path = File.join(Dragonfly.app.datastore.root_path, image.uid)
+          image_path = File.join(Dragonfly.app.datastore.root_path, image.send(:uid))
           if !image_url.blank? && !image_path.blank?
             growl
             system("mkdir -p #{image_path.sub(/[^\/]*$/, "")}")

@@ -1,9 +1,10 @@
 %fieldset
-  %legend= t('.url', default: 'URL')
+  %hr
+  %h4.col-primary= t('.url', default: 'URL')
   = form.input :permalink_path, :prepend => content_package.parent && content_package.parent.respond_to?(:permalink_display_path) && Pig.configuration.nested_permalinks ? content_package.parent.permalink_display_path : '/'
   - if content_package.permalinks.inactive.any?
-    %h4= t('.inactive_permalinks', default: 'Aliases')
+    %label= t('.inactive_permalinks', default: 'Aliases')
     %ul
     - content_package.permalinks.inactive.each do |permalink|
-      %li= link_to permalink.full_path, '' + permalink.full_path
-  = form.input :short_permalink_path, prepend: '/'
+      %li= link_to permalink.full_path, '' + permalink.full_path, class: "col-primary"
+  = form.input :short_permalink_path, prepend: '/', label: 'Add an alias'

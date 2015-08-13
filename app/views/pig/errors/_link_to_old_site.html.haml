@@ -1,4 +1,6 @@
 - archive = Pig::Archive.new(request)
 - if archive.active? && archive.exists?
-  %p The page you are looking for is still on our old site.  We haven't moved it yet.
-  = link_to('View this page on our old website', archive.uri, class: 'btn btn-primary')
+  %p.error-page__text
+    But you can still access it on the old site
+    =succeed '.' do
+      = link_to('here', archive.uri)

@@ -1,0 +1,28 @@
+.flex-middle {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  -webkit-justify-content: center;
+  justify-content: center;
+  height: 100%;
+}
+.devise-input {
+  padding: 0 0 10px;
+}
+.devise-title {
+  margin-top: 20px;
+}
+.devise-checkbox {
+  margin: 5px 0 15px;
+}
+.btn-devise {
+  margin: 0;
+  height: 60px;
+}
+.devise-links {
+  a {
+    text-decoration: underline;
+  }
+}

@@ -10,7 +10,7 @@ var ReassignableContent = React.createClass({
           {this.props.name}
         </td>
         <td>
-          <select name={"content_package[" + this.props.id + "]"} className="input-sm deactivate-user-select">
+          <select name={"content_package[" + this.props.id + "]"} className="input-sm deactivate-user-select pull-right">
             {optionRows}
           </select>
         </td>

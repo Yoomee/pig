@@ -31,21 +31,23 @@ var PackageReassigner = React.createClass({
               <h4 className="modal-title">Reassign Content</h4>
             </div>
             <div className="modal-body">
-              {this.state.content.length == 0 ? 'This user has no content currently assigned to them.' : 'Please choose who you would like to reassign this user\'s content to:'}
+              <p>
+                {this.state.content.length == 0 ? 'This user has no content currently assigned to them.' : 'Please choose who you would like to reassign this user\'s content to:'}
+              </p>
               <If test={this.state.content.length > 0}>
-                <table className="table table-full-width">
+                <table className="table select-table table-full-width">
                   <tr>
                     <td>
                       Resassign all content to
                     </td>
                     <td>
-                      <select name="all_content_package" className="input-sm" onChange={this.updateAllReassignableContent}>
+                      <select name="all_content_package" className="input-sm pull-right" onChange={this.updateAllReassignableContent}>
                         {optionRows}
                       </select>
                     </td>
                   </tr>
                   <tr>
-                    <td colSpan="2" className="align-center">
+                    <td colSpan="2" className="align-center table-spacer">
                       or assign content individually
                     </td>
                   </tr>
@@ -57,7 +59,7 @@ var PackageReassigner = React.createClass({
               <a className="btn btn-default" data-dismiss="modal">
                 Cancel
               </a>
-              <input className="btn btn-primary" type="submit" value={"Deactivate user" + (this.state.content.length > 0 ? ' and reassign content' : '')} />
+              <input className="btn btn-error" type="submit" value={"Deactivate user" + (this.state.content.length > 0 ? ' and reassign content' : '')} />
             </div>
           </div>
         </form>

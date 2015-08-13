@@ -36,7 +36,7 @@
             -if (can? :manage, Pig::User)
               %li{:class => @users || @user ? 'active' : nil}
                 =link_to(pig.manage_users_path) do
-                  %i.fa.fa-file-text-o
+                  %i.fa.fa-user
                   %span User Management
             %li
               =link_to('/personas') do

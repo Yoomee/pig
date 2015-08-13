@@ -1,0 +1,11 @@
+.cms-form-well
+  %h2.text-center.devise-title Forgot your password?
+  = form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f|
+    = devise_error_messages!
+    .field.devise-input
+      = f.label :email
+      = f.email_field :email, autofocus: true
+    .actions
+      = f.submit "Send me reset password instructions", class: 'btn btn-primary btn-block btn-devise'
+.devise-links
+  = render "devise/shared/links"

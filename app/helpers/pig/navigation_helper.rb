@@ -42,7 +42,7 @@ module Pig
         is_active: proc { @users || @user },
         url: pig.manage_users_path,
         title: 'User Management',
-        icon: 'file-text-o'
+        icon: 'user'
       }
       nav_items << {
         visible: proc { can? :manage, Persona },

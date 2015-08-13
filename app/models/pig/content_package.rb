@@ -74,7 +74,7 @@ module Pig
         end
       end
       self.editing_user = Pig::User.where(role: 'developer').first
-      save
+      save(validate: false)
     end
 
       def self.convert_all_chunks_to_content!
