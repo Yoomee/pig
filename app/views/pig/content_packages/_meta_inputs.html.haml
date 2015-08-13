@@ -1,0 +1,8 @@
+.cms-form-well
+  =form.inputs do
+    =form.input :meta_title, hint: 'Meta title: aim for 70 characters'
+    =form.input :meta_description, hint: 'Meta short description: Brief summary of the page, aim for 70 characters'
+    =form.input :meta_keywords, hint: 'Meta keywords: comma separated'
+    =form.input :meta_image, as: :image, hint: 'Meta images for facebook: Minimum size 600px x 315px, recommended size 1200px x 630px'
+    -unless @content_package.viewless?
+      =render 'permalinks', content_package: @content_package, form: form

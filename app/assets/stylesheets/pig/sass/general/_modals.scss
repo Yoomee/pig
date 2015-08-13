@@ -89,6 +89,7 @@
   padding: 15px;
   background: $brand-primary;
   min-height: (16.428571429);
+  border-radius: 3px 3px 0 0;
   * {
     color: white;
   }
@@ -126,7 +127,7 @@
   }
 }
 .modal-footer {
-  padding: 0 30px 15px;
+  padding: 0 30px 30px;
   clear:both;
   text-align: center;
   .btn + .btn {

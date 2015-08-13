@@ -1,9 +1,9 @@
 module Pig
   class RedactorImageUpload < ActiveRecord::Base
 
-    image_accessor :file
-    validates_property :format, :of => :image, :in => [:jpeg, :jpg, :png, :gif, :JPEG, :JPG, :PNG, :GIF], :message => "must be an image"
-    validate :file_uid, :presence => true
+    dragonfly_accessor :file
+    validates_property :format, of: :file, in: ['jpeg', 'png', 'gif']
+    validates :file, presence: true
 
     def image
       file_type == 'image' ? file : nil

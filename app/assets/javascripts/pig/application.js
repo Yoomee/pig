@@ -17,6 +17,7 @@
 //= require bootstrap/modal
 
 //= require cocoon
+//= require pig/pig_config
 //= require pig/widgets
 //= require pig/navigation_manager
 //= require pig/custom
@@ -180,8 +181,8 @@ window.Pig = {
         buttons: ['html', 'formatting', 'bold', 'italic', 'unorderedlist', 'orderedlist', 'image', 'link', 'horizontalrule'],
         plugins: $('.rich_redactor textarea').data('redactor-plugins'),
         path: 'vendor/assets/javascripts/redactor',
-        imageUpload: '/content/redactor_image_uploads?file_type=image',
-        imageGetJson: '/content/redactor_image_uploads',
+        imageUpload: PigConfig.namespace + 'redactor_image_uploads?file_type=image',
+        imageGetJson: PigConfig.namespace + 'redactor_image_uploads',
         formatting: ['p', 'h1', 'h2', 'h3', 'h4', 'h5'],
         imageResizable: false,
         imagePosition: false,

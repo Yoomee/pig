@@ -1,0 +1,5 @@
+.cms-form-well
+  =form.inputs do
+    -@non_meta_content_attributes.each do |content_attribute|
+      /content_input is defined in config/initializers/formtastic_ext.rb
+      =form.content_input content_attribute

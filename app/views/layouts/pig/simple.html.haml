@@ -4,9 +4,9 @@
     =render('layouts/pig/head')
     =csrf_meta_tags
   -body_tag do
-    .cms-wrapper
+    .cms-wrapper.flex-middle
       .container
-        .row-fluid
+        .row
           .col-sm-6.col-sm-offset-3
             =render 'layouts/pig/flash'
             =yield

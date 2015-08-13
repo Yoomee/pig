@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pig (0.0.1)
+    pig (0.0.2)
       acts-as-taggable-on
       bootstrap-sass
       cancancan

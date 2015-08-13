@@ -6,12 +6,16 @@ module Pig
     after_validation :set_meta_title, :if => :meta?
     after_validation :set_slug
     validates :slug, :name, :field_type, :presence => true
-    validates :slug, :name,
-      uniqueness: { scope: :content_type_id },
-      exclusion: {
-        in: Pig::ContentPackage.methods + Pig::ContentPackage.column_names,
-        message: "%{value} is a reserved word."
-      }
+    begin
+      validates :slug, :name,
+        uniqueness: { scope: :content_type_id },
+        exclusion: {
+          in: Pig::ContentPackage.methods + Pig::ContentPackage.column_names,
+          message: "%{value} is a reserved word."
+        }
+    rescue ActiveRecord::StatementInvalid
+      # Migrations not yet carried out, but need to be able to precompile
+    end
     belongs_to :resource_content_type, :class_name => 'ContentType'
 
 
