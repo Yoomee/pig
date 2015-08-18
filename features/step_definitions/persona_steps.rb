@@ -50,7 +50,7 @@ end
 
 When(/^I select the persona on the form$/) do
   find(:xpath, "//input[@name='content_package[persona_ids][]' and @value='#{@persona.id}']").set(true)
-  click_button('Save changes')
+  click_button('Save and continue editing')
 end
 
 Then(/^the persona should be applied to the content package$/) do

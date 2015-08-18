@@ -118,7 +118,7 @@
                 %h4.col-primary Page settings
                 %hr
                 =form.inputs do
-                  =parent_content_package_select(form)
+                  =form.input :parent_id, as: :select, collection: nested_set_options(Pig::ContentPackage, @content_package) {|i| "#{'-' * i.level} #{i.name}" }
                   -if can? :manage_slug, @content_package
                     =form.input :slug
                   =form.input :logged_in_only, :as => :content_boolean, :label => "Only logged in users can view this"
@@ -126,10 +126,11 @@
 
         .cms-sidebar-actions
           -if current_user.role == "author"
-            =form.action :submit, :label => "Save changes", :button_html => {:class => "btn btn-success pull-right", data: { form_action: pig.content_package_path(@content_package) } }
+            =form.action :submit, :label => "Save and continue editing", :button_html => {:class => "btn btn-success pull-right", data: { form_action: pig.content_package_path(@content_package) } }
             =form.action :submit, :label => "Mark as ready to review", :button_html => {:class => "btn pull-right", data: { form_action: pig.ready_to_review_content_package_path(@content_package) } }
           -else
-            =form.action :submit, :label => "Save changes", :button_html => {:class => "btn btn-success pull-right"}
+            =form.action :submit, label: 'Save and view', button_html: { class: 'btn btn-success pull-right', data: { form_action: pig.content_package_path(@content_package, view: true) } }
+            =form.action :submit, label: 'Save and continue editing', button_html: { class: 'btn btn-success pull-right', data: { form_action: pig.content_package_path(@content_package) } }
           .clearfix
 
       .col-md-4
@@ -196,3 +197,9 @@
               %label.col-primary Content requested by
               %p
                 =@content_package.requested_by.try(:full_name)
+          - if ga_code?
+            %ul.cms-tabs
+              %li.active=link_to("Analytics", '#analytics', 'data-toggle' => 'pill')
+            .tab-content
+              #analytics.tab-pane.active.cms-well
+                = react_component('ContentPackageAnalytics', analyticsPath: pig.analytics_content_package_path(@content_package))

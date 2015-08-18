@@ -3,6 +3,8 @@ module Pig
 
     has_many :content_attributes, -> { order(:position, :id) }
     has_many :content_packages, -> { where(:deleted_at => nil)}
+    has_many :dependent_content_packages, class_name: 'Pig::ContentPackage', 
+      foreign_key: 'content_type_id'
     has_many :resource_tag_categories, as: :taggable_resource
     has_many :tag_categories, through: :resource_tag_categories
 
@@ -17,7 +19,7 @@ module Pig
     default_scope -> { includes(:content_attributes) }
 
     def destroyable?
-      content_packages.count.zero?
+      dependent_content_packages.count.zero?
     end
 
     def missing_view?

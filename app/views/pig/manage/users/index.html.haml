@@ -34,7 +34,7 @@
             %td.user-name
               =link_to(user.full_name, pig.manage_user_path(user))
             %td.user-role
-              =user.role
+              =user.role.to_s.humanize
 
             %td.user-actions
               =link_to('Edit', pig.edit_manage_user_path(user), class: 'btn btn-xs btn-success edit-user-btn')

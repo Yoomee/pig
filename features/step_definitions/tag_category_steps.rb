@@ -83,7 +83,7 @@ When(/^I create a content package and tag it$/) do
   click_button(@tag_category.name)
   @tag = @tag_category.taxonomy_list.first
   find(:xpath, "//input[@name='content_package[taxonomy_tags][#{@tag_category.slug}][]' and @value='#{@tag}']").set(true)
-  click_button('Save changes')
+  click_button('Save and continue editing')
 end
 
 Then(/^the content package is created with the tag$/) do

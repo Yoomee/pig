@@ -36,24 +36,25 @@ When(/^I fill in the new cms user form and submit$/) do
   fill_in "user_email", :with => @user.email
   fill_in "user_password", :with => @user.password
   fill_in "user_password_confirmation", :with => @user.password
-  select(@user.role, :from => 'user_role')
+  select(@user.role.capitalize, :from => 'user_role')
   click_button('Save')
+  @user = Pig::User.last
 end
 
 Then(/^the user is (created|updated)$/) do |action|
-  visit pig.manage_users_path(@user)
+  visit pig.manage_user_path(@user)
   expect(page).to have_content(@user.first_name)
   expect(page).to have_content(@user.last_name)
   if action == 'updated'
     expect(page).to have_content("Edited")
   end
-  expect(page).to have_content(@user.role)
+  expect(page).to have_content(@user.role.try(:capitalize))
 end
 
 When(/^I fill in the edit cms user form and submit$/) do
   visit pig.edit_manage_user_path(@user)
   fill_in "user_last_name", :with => "Edited"
-  select(@user.role, :from => 'user_role')
+  select(@user.role.capitalize, :from => 'user_role')
   click_button('Save')
   @user = Pig::User.find(@user.id)
 end
@@ -112,7 +113,7 @@ end
 
 When(/^I change the role of the user to (.*)$/) do |role|
   visit pig.edit_manage_user_path(@user)
-  select(role, from: 'user_role')
+  select(role.capitalize, from: 'user_role')
   click_button('Save')
 end
 

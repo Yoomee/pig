@@ -21,12 +21,6 @@ module Pig
     it { should belong_to(:content_type) }
     it { should belong_to(:parent).class_name('ContentPackage') }
     it { should have_many(:content_chunks) }
-    it { should have_many(:children)
-      .class_name('ContentPackage')
-      .with_foreign_key('parent_id')
-      .conditions(deleted_at: nil)
-      .order([:position, :id])
-    }
     it { should have_many(:deleted_children)
       .class_name('ContentPackage')
       .with_foreign_key('parent_id')
@@ -40,11 +34,6 @@ module Pig
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:requested_by) }
     it { should validate_presence_of(:review_frequency) }
-
-
-#     scope :root, -> { where(:parent_id => nil, :deleted_at => nil).order(:position, :id) }
-#     scope :published, -> { where(:status => 'published').where('publish_at <= ? OR publish_at IS NULL', Date.today) }
-#     scope :expiring, -> { where('next_review < ?', Date.today) }
 
     it 'is valid' do
       content_package.valid?

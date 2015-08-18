@@ -87,7 +87,7 @@ When(/^I update the content package$/) do
   attach_file('Photo', File.join(Rails.root, 'public/dragonfly/defaults/user.jpg'))
   attach_file('Document', File.join(Rails.root, 'public/dragonfly/defaults/user.jpg'))
   check('Is this special?')
-  click_button("Save")
+  click_button("Save and continue editing")
 end
 
 Then(/^the content package should change$/) do
@@ -145,7 +145,7 @@ end
 When(/^I assign it to an author$/) do
   visit pig.edit_content_package_path(@content_package)
   select("#{@author.full_name} (#{@author.role})", :from => 'content_package[author_id]', :visible => false)
-  click_button("Save")
+  click_button("Save and continue editing")
 end
 
 Then(/^the content package author should change$/) do
@@ -292,7 +292,7 @@ end
 When(/^I publish the content package$/) do
   visit pig.edit_content_package_path(@content_package)
   select('Published', from: 'Status')
-  click_button('Save changes')
+  click_button('Save and continue editing')
 end
 
 Then(/^the content package should be published$/) do
@@ -380,7 +380,7 @@ When(/^I move the child to a new parent$/) do
   visit pig.edit_content_package_path(@content_package)
   click_link "Settings"
   select(@parent_content_package.name, from: "Parent")
-  click_button('Save changes')
+  click_button('Save and continue editing')
 end
 
 Then(/^the content package should move to the new parent$/) do

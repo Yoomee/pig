@@ -11,10 +11,10 @@ module Pig
 
     layout 'layouts/application', only: [:show, :home]
     load_and_authorize_resource
-    skip_load_resource :home
+    skip_load_resource only: [:home, :restore, :destroy]
     # Define an around filter for all controller actions that could potentially be routed to from a permalink
     around_action :redirect_to_permalink, :only => ContentPackage.member_routes.collect{ |x| x[:action] }
-    before_action :set_editing_user, only: [:create, :delete, :update, :destroy, :ready_to_review, :restore]
+    before_action :set_editing_user, only: [:create, :delete, :update, :ready_to_review]
 
     def activity
       if request.xhr?
@@ -29,6 +29,17 @@ module Pig
     end
 
     def children
+    end
+
+    def analytics
+      begin
+        user = service_account_user
+        profile = user.accounts.first.profiles.first
+        analytics = Pig::Analytics.new(Visits.page_path(@content_package.permalink.full_path, profile).results(start_date: 7.days.ago))
+        render json: analytics.as_json
+      rescue
+        render json: { error: "Ooops, you haven't setup the Google analytics configuration properly. See the readme!" }, status: 500
+      end
     end
 
     def edit
@@ -53,10 +64,12 @@ module Pig
     end
 
     def deleted
-      @deleted_content_packages = ContentPackage.where("deleted_at IS NOT NULL").order("deleted_at DESC").paginate(:page => params[:page], :per_page => 50)
+      @deleted_content_packages = ContentPackage.deleted.paginate(:page => params[:page], :per_page => 50)
     end
 
     def destroy
+      @content_package = Pig::ContentPackage.unscoped.find(params[:id])
+      set_editing_user
       if @content_package.destroy
         flash[:notice] = "Destroyed \"#{@content_package}\""
       else
@@ -66,7 +79,7 @@ module Pig
     end
 
     def index
-      @content_packages = @content_packages.root.includes(:children, :content_type, :author)
+      @content_packages = @content_packages.roots.includes(:children, :content_type, :author)
       if params[:open] && open_content_package = ContentPackage.find_by_id(params[:open])
         @open = [open_content_package] + open_content_package.parents
       end
@@ -107,6 +120,8 @@ module Pig
     end
 
     def restore
+      @content_package = Pig::ContentPackage.unscoped.find(params[:id])
+      set_editing_user
       @content_package.restore
       flash[:notice] = "Restored \"#{@content_package}\""
       redirect_to content_packages_path(:open => @content_package)
@@ -189,7 +204,11 @@ module Pig
           @content_package.published_at = DateTime.now
           @content_package.save
         end
-        redirect_to pig.edit_content_package_path(@content_package)
+        if params[:view]
+          redirect_to pig.content_package_path(@content_package)
+        else
+          redirect_to pig.edit_content_package_path(@content_package)
+        end
       else
         #TODO change to flash[:error] when the style has been made
         flash[:notice] = "Sorry there was a problem saving this page: #{@content_package.errors.full_messages.to_sentence}"
@@ -238,6 +257,44 @@ module Pig
     def params_for_redirect
       significant_params = params.except(:action, :controller, :id, :path)
       significant_params.present? ? '?' + significant_params.to_query : ''
+    end
+
+    def service_account_user(scope="https://www.googleapis.com/auth/analytics.readonly")
+      api_version = 'v3'
+      cached_api_file = "analytics-#{api_version}.cache"
+
+      ## Read app credentials from a file
+      opts = YAML.load_file("ga_config.yml")
+
+      ## Update these to match your own apps credentials in the ga_config.yml file
+      service_account_email = opts['service_account_email']  # Email of service account
+      key_file = opts['key_file']                            # File containing your private key
+      key_secret = opts['key_secret']                        # Password to unlock private key
+      @profileID = opts['profileID'].to_s                    # Analytics profile ID.
+
+      @client = Google::APIClient.new(
+      :application_name => opts['application_name'],
+      :application_version => opts['application_version'])
+
+      ## Load our credentials for the service account
+      key = Google::APIClient::KeyUtils.load_from_pkcs12(key_file, key_secret)
+
+      @client.authorization = Signet::OAuth2::Client.new(
+      :token_credential_uri => 'https://accounts.google.com/o/oauth2/token',
+      :audience => 'https://accounts.google.com/o/oauth2/token',
+      :scope => 'https://www.googleapis.com/auth/analytics.readonly',
+      :issuer => service_account_email,
+      :signing_key => key)
+
+      ## Request a token for our service account
+      token = @client.authorization.fetch_access_token!
+
+      oauth_client = OAuth2::Client.new("", "", {
+        :authorize_url => 'https://accounts.google.com/o/oauth2/auth',
+        :token_url => 'https://accounts.google.com/o/oauth2/token'
+      })
+      token = OAuth2::AccessToken.new(oauth_client, token['access_token'], expires_in: 1.hour)
+      Legato::User.new(token)
     end
   end
 end

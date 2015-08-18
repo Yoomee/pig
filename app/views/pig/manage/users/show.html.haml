@@ -15,7 +15,7 @@
         .col-sm-2.p0
           .label.upper Role
           -if @user.role.present?
-            =@user.role
+            =@user.role.to_s.humanize
           -else
             - if can?(:edit, @user)
               =link_to("Set a role for this user", pig.edit_manage_user_path(@user))

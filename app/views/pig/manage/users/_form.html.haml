@@ -7,7 +7,7 @@
     .clearfix
     =form.input :email
     -if can? :manage_role, @user
-      =form.input :role, :as => :select, :collection => Pig::User.available_roles, :include_blank => false
+      =form.input :role, :as => :select, :collection => Pig::User.available_roles.map{ |r| [r.to_s.humanize, r] }, :include_blank => false
     =form.input :password
     =form.input :password_confirmation
     =form.input :bio, :input_html => {:rows => 5, :class => 'span4'}

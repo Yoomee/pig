@@ -47,6 +47,7 @@ Pig::Engine.routes.draw do
       get 'activity'
       post 'upload_sir_trevor_attachment'
       patch 'ready_to_review'
+      get 'analytics'
     end
   end
 
