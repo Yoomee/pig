@@ -21,11 +21,6 @@ Scenario: I can view a page by its original permalink even after it has changed
   And I visit "/new-permalink"
   Then I should see all its content
 
-Scenario: I can visit a content package by its /content_package/:id and get redirected to its permalink
-  Given there is 1 content package
-  When I visit its restful url
-  Then I should get redirected to its permalink
-
 @allow-rescue
 Scenario: I visit a permalink that doesn't exist I get a 404
   Given there is 1 content package
@@ -41,4 +36,4 @@ Scenario: I can visit a content package without a permalink
 Scenario: I can not visit an unpublished content package by its permalinks
   Given there is 1 unpublished content package
   When I visit its permalink
-  Then I should get redirected to the login page
+  Then I should get a 404

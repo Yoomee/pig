@@ -42,8 +42,8 @@ module Pig
         expect(content_type.missing_view?).to be_truthy
       end
 
-      it 'returns true if view exists' do
-        views_path = "#{Rails.root}/app/views/content_packages/views"
+      it 'returns false if view exists' do
+        views_path = "#{Rails.root}/app/views/pig/front/content_packages/views"
         `mkdir -p #{views_path}`
         `touch #{views_path}/#{content_type.view_name}.html.haml`
         expect(content_type.missing_view?).to be_falsey

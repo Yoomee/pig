@@ -38,7 +38,7 @@ Given(/^there is a content package with an inactive permalink$/) do
 end
 
 When(/^I go to the sitemap$/) do
-  visit pig.content_packages_path
+  visit pig.admin_content_packages_path
 end
 
 When(/^it changes parent$/) do
@@ -66,7 +66,7 @@ Then(/^I can edit the content packages$/) do
 end
 
 When(/^I fill in the new content package form and submit$/) do
-  visit pig.new_content_type_content_package_path(@content_type)
+  visit pig.new_admin_content_type_content_package_path(@content_type)
   @content_package = FactoryGirl.build(:content_package, :content_type => @content_type, :author => @current_user)
   select(@content_type)
   fill_in('Name', :with => @content_package.name)
@@ -81,17 +81,17 @@ Then(/^I am taken to edit the content package$/) do
 end
 
 When(/^I update the content package$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   fill_in('Title', :with => 'Modified title')
   select(Pig::User.first.full_name, :from => 'Person')
   attach_file('Photo', File.join(Rails.root, 'public/dragonfly/defaults/user.jpg'))
   attach_file('Document', File.join(Rails.root, 'public/dragonfly/defaults/user.jpg'))
   check('Is this special?')
-  click_button("Save")
+  click_button("Save and continue editing")
 end
 
 Then(/^the content package should change$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   expect(page).to have_xpath("//img[contains(@src, \"media\")]")
   expect(find('#content_package_special')).to be_checked
   expect(find_field('Title').value).to eq('Modified title')
@@ -99,7 +99,7 @@ Then(/^the content package should change$/) do
 end
 
 Given(/^I remove an image$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   check 'content_package_remove_photo'
   click_button("Save")
 end
@@ -109,7 +109,7 @@ Then(/^the image should be removed$/) do
 end
 
 When(/^I go to the content package$/) do
-  visit pig.content_package_path(@content_package)
+  visit pig.content_package_path(@content_package.permalink)
 end
 
 Then(/^I should see all its content$/) do
@@ -119,7 +119,7 @@ Then(/^I should see all its content$/) do
 end
 
 When(/^I discuss the content package$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   click_link('Discussion')
   fill_in('post_text', :with => "Some sample text")
   click_button("Post")
@@ -130,7 +130,7 @@ Then(/^the discussion count should increase$/) do
 end
 
 When(/^I mark the content package as ready to review$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   click_button("Mark as ready to review")
 end
 
@@ -143,9 +143,9 @@ Then(/^it is assigned back to the requester$/) do
 end
 
 When(/^I assign it to an author$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   select("#{@author.full_name} (#{@author.role})", :from => 'content_package[author_id]', :visible => false)
-  click_button("Save")
+  click_button("Save and continue editing")
 end
 
 Then(/^the content package author should change$/) do
@@ -158,12 +158,12 @@ Then(/^the author should be emailed$/) do
 end
 
 When(/^I go to edit the content package$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
 end
 
 When(/^I fill in a content attribute with a (character|word) limit$/) do |word_character|
   word = word_character == 'word'
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   fill_in("content_package_#{word ? 'text' : 'title'}", :with => (word ? "a " : "a") * 10, :visible => false)
 end
 
@@ -173,7 +173,7 @@ end
 
 When(/^I exceed the (character|word) limit of a content attribute$/) do |word_character|
   word = word_character == 'word'
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   fill_in("content_package_#{word ? 'text' : 'title'}", :with => (word ? "a " : "a") * 31, :visible => false)
 end
 
@@ -188,15 +188,6 @@ end
 
 When(/^I change the content package "(.*?)" to "(.*?)"$/) do |attribute, value|
   @content_package.update(attribute.to_sym => value)
-end
-
-When(/^I visit its restful url$/) do
-  visit "/content_packages/#{@content_package.id}".squeeze '/'
-end
-
-When(/^I visit its restful url with params$/) do
-  @params = 'utm_campaign=STA'
-  visit "/content_packages/#{@content_package.id}".squeeze('/') + '?' + @params
 end
 
 Then(/^I should get redirected to its permalink$/) do
@@ -235,7 +226,7 @@ Given(/^one of the content packages is named "(.*?)"$/) do |name|
 end
 
 When(/^I go to the list of content packages$/) do
-  visit pig.content_packages_path
+  visit pig.admin_content_packages_path
 end
 
 When(/^I search for "(.*?)"$/) do |term|
@@ -290,9 +281,9 @@ Then(/^I see the content packages in the open requests area$/) do
 end
 
 When(/^I publish the content package$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   select('Published', from: 'Status')
-  click_button('Save changes')
+  click_button('Save and continue editing')
 end
 
 Then(/^the content package should be published$/) do
@@ -303,7 +294,7 @@ end
 When(/^I delete the content package$/) do
   @content_package.slug = ''
   @content_package.save
-  visit pig.content_packages_path
+  visit pig.admin_content_packages_path
   within "tr#content-package-#{@content_package.id}" do
     click_link 'More'
     click_link 'Delete'
@@ -312,7 +303,7 @@ end
 
 When(/^I destroy the content package$/) do
   @deleted_content_package_id = @content_package.id
-  visit pig.deleted_content_packages_path
+  visit pig.deleted_admin_content_packages_path
   within "tr#deleted-content-package-#{@content_package.id}" do
     click_link 'Destroy'
   end
@@ -327,29 +318,29 @@ Then(/^It should no longer be visible in the sitemap$/) do
 end
 
 Then(/^it should appear in the list of deleted content packages$/) do
-  visit pig.deleted_content_packages_path
+  visit pig.deleted_admin_content_packages_path
   expect(page).to have_content(@content_package.name)
 end
 
 When(/^I restore the content package$/) do
-  visit pig.deleted_content_packages_path
+  visit pig.deleted_admin_content_packages_path
   within "tr#deleted-content-package-#{@content_package.id}" do
     click_link 'Restore'
   end
 end
 
 Then(/^it should appear in the sitemap$/) do
-  visit pig.content_packages_path
+  visit pig.admin_content_packages_path
   expect(page).to have_selector("tr#content-package-#{@content_package.id}")
 end
 
 Then(/^It shouldn't appear in the list of deleted content packages$/) do
-  visit pig.deleted_content_packages_path
+  visit pig.deleted_admin_content_packages_path
   expect(page).to have_no_selector("tr#deleted-content-package-#{@content_package.id}")
 end
 
 When(/^I add a child to the content package$/) do
-  visit pig.content_packages_path
+  visit pig.admin_content_packages_path
   within "tr#content-package-#{@content_package.id}" do
     click_link 'More'
     click_link 'Add child'
@@ -369,7 +360,7 @@ When(/^I fill in the new child content package form and submit$/) do
 end
 
 Then(/^the content package should appear as a child in the sitemap$/) do
-  visit pig.content_packages_path
+  visit pig.admin_content_packages_path
   wait_for_ajax
   find("tr#content-package-#{@content_package.id} td:first-of-type").click
   wait_for_ajax
@@ -377,10 +368,10 @@ Then(/^the content package should appear as a child in the sitemap$/) do
 end
 
 When(/^I move the child to a new parent$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   click_link "Settings"
   select(@parent_content_package.name, from: "Parent")
-  click_button('Save changes')
+  click_button('Save and continue editing')
 end
 
 Then(/^the content package should move to the new parent$/) do
@@ -388,6 +379,6 @@ Then(/^the content package should move to the new parent$/) do
 end
 
 When(/^I mark the content package as published$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
   select('Published', from: "Status")
 end

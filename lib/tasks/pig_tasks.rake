@@ -1,4 +1,4 @@
-require "capybara/dsl"
+ require "capybara/dsl"
 require "capybara/poltergeist"
 require 'benchmark'
 
@@ -13,7 +13,7 @@ class Screenshot
   # Captures a screenshot of +url+ saving it to +path+.
   def capture(url, path)
     visit url
-    return page.driver.status_code == 200
+    return page.driver.status_code == 200 && !page.body.include?('Pig::')
   end
 end
 
@@ -27,6 +27,7 @@ namespace :pig do
 
     links_to_test = Pig::Permalink.active
     links_to_test.each do |permalink|
+      next if permalink.resource.nil? || permalink.resource.viewless?
       pages_tested += 1
       screenshot = Screenshot.new
       success = false

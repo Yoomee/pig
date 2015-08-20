@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module Pig
-  RSpec.describe 'pig/manage/users/show', type: :view do
+  RSpec.describe 'pig/admin/manage/users/show', type: :view do
     let(:user) { FactoryGirl.create(:user, :author, first_name: "Jimmy",
                                                     last_name: "Foo") }
     let(:content_package) { FactoryGirl.create(:content_package, author: user) }
@@ -22,7 +22,7 @@ module Pig
     end
 
     it "should have a link to show all users" do
-      expect(rendered).to have_link('See all users', href: pig.manage_users_path)
+      expect(rendered).to have_link('See all users', href: pig.admin_manage_users_path)
     end
   end
 end

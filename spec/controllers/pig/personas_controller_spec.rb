@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module Pig
-  RSpec.describe PersonasController, type: :controller do
+  RSpec.describe Admin::PersonasController, type: :controller do
     routes { Pig::Engine.routes }
 
     context "not signed in" do

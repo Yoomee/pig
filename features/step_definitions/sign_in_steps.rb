@@ -9,7 +9,7 @@ When(/^I complete the form with email "(.*?)" and password "(.*?)"$/) do |email,
 end
 
 Then(/^I should be redirected to the dashboard$/) do
-  expect(current_path).to eq(pig.root_path)
+  expect(current_path).to eq(pig.admin_root_path)
 end
 
 Then(/^I should be redirected to the sign in page$/) do

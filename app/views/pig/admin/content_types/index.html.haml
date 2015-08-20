@@ -1,0 +1,56 @@
+:javascript
+  $(document).ready(function(){
+    Pig.ContentTypes.init()
+  });
+
+.container.page-margin-bottom
+  =render('pig/admin/content_packages/sitemap_header', header_title: 'Templates')
+  .row
+    .col-xs-12
+      .tab-content.tab-content-sitemap.relative
+        #content-types.tab-pane.active.sitemap
+          %table.cms-table.table-content-types
+            %thead
+              %tr
+                %th.text-left{:colspan => 4} Content template / Name
+            %tbody
+              -@content_types.each do |content_type|
+                %tr.content-type{:id => "content-type-#{content_type.id}", :class => "#{'has-children' unless content_type.content_packages.count.zero?}", :data => {depth: 0, open_url: pig.children_admin_content_type_path(content_type)}}
+                  %td.td-name.col-md-10
+                    .name
+                      -unless content_type.content_packages.count.zero?
+                        %i.fa.fa-caret-right.sitemap-caret
+                      =content_type.to_s.pluralize
+                      %span.text-muted
+                        =pluralize(content_type.content_packages.count, 'page')
+                      =needs_design(content_type)
+                  %td
+                  %td
+                    =link_to('Edit', pig.edit_admin_content_type_path(content_type))
+                  %td
+                    .dropdown
+                      =link_to('More'.html_safe, '#', 'data-toggle' => 'dropdown', :icon => 'angle-down', :icon_last => true)
+                      %ul.dropdown-menu.dropdown-menu-right
+                        %li=link_to("Add new content of this type", pig.new_admin_content_type_content_package_path(content_type))
+                        %li=link_to('Duplicate...', '#', :class => 'js-duplicate-link', :data => {:content_type_id => content_type.id})
+                        %li=link_to('Reorder content attributes', pig.reorder_admin_content_type_path(content_type))
+                        -if content_type.destroyable?
+                          %li=link_to('Delete this content template', pig.admin_content_type_path(content_type), :method => :delete, :data => {:confirm => "Are you sure you want to delete this content template? This cannot be undone."})
+      -if can? :new, Pig::ContentType
+        =link_to("Add new content template", pig.new_admin_content_type_path, :icon => 'plus', :class => 'btn btn-success btn-small mt-3 pull-right')
+.modal.fade#duplicate-modal
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close-btn{:type => "button", :data => {:dismiss => "modal"}}
+          %i.fa.fa-times
+        %h4.modal-title Duplicate
+      .modal-body
+        %p
+          Copy the content attributes of this content template onto
+        =select_tag(:duplicate_to, options_from_collection_for_select(@content_types, "id", "name"), :prompt => "A new content template")
+        %br
+      .modal-footer
+        %button.btn.btn-primary.js-duplicate-submit.pull-right{:type => "button", :data => {:dismiss => "modal", duplicate_url: pig.duplicate_admin_content_type_path(id: ':id')}} Duplicate
+        %button.btn.btn-default.pull-right{:type => "button", :data => {:dismiss => "modal"}} Cancel
+        .clearfix

@@ -23,12 +23,17 @@ require 'cells'
 require 'cells-haml'
 require 'httparty'
 require 'react-rails'
+require 'oauth2'
+require 'legato'
+require 'google/api_client'
+require 'awesome_nested_set'
 
 require 'pig/link'
 require 'pig/permalinkable'
 require 'pig/archive'
 require 'pig/core/plugins'
 require 'pig/core/image_downloader'
+require 'pig/metrics/visits'
 
 # Concerns
 require 'pig/concerns/models/core'

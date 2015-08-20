@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module Pig
-  RSpec.describe ContentPackagesController, type: :controller do
+  RSpec.describe Admin::ContentPackagesController, type: :controller do
     routes { Pig::Engine.routes }
 
     # This should return the minimal set of attributes required to create a valid
@@ -30,13 +30,14 @@ module Pig
         end
       end
 
-      describe 'GET #show' do
-        it 'assigns the requested content_package as @content_package' do
-          content_package = FactoryGirl.create(:content_package)
-          get :show, { id: content_package.to_param }, valid_session
-          expect(assigns(:content_package)).to eq(content_package)
-        end
-      end
+      # TODO: Move this into a new front spec
+      # describe 'GET #show' do
+      #   it 'assigns the requested content_package as @content_package' do
+      #     content_package = FactoryGirl.create(:content_package)
+      #     get :show, { id: content_package.to_param }, valid_session
+      #     expect(assigns(:content_package)).to eq(content_package)
+      #   end
+      # end
 
       describe 'GET #new' do
         it 'assigns a new content_package as @content_package' do
@@ -69,7 +70,7 @@ module Pig
 
           it 'redirects to the created content_package' do
             post :create, { content_package: valid_attributes }, valid_session
-            expect(response).to redirect_to(edit_content_package_path(ContentPackage.last))
+            expect(response).to redirect_to(edit_admin_content_package_path(ContentPackage.last))
           end
         end
 
@@ -108,7 +109,7 @@ module Pig
           it 'redirects to the content_package' do
             content_package = FactoryGirl.create(:content_package)
             put :update, { id: content_package.to_param, content_package: valid_attributes }, valid_session
-            expect(response).to redirect_to(edit_content_package_path(content_package))
+            expect(response).to redirect_to(edit_admin_content_package_path(content_package))
           end
         end
 
@@ -138,7 +139,7 @@ module Pig
         it 'redirects to the content_packages list' do
           content_package = FactoryGirl.create(:content_package)
           delete :destroy, { id: content_package.to_param }, valid_session
-          expect(response).to redirect_to(deleted_content_packages_path)
+          expect(response).to redirect_to(deleted_admin_content_packages_path)
         end
       end
     end

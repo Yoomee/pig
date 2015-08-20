@@ -1,0 +1,56 @@
+:javascript
+  Pig.ContentPackages.descriptions = #{Hash[Pig::ContentType.all.map{|ct| [ct.id, ct.description]}].to_json};
+  $(document).ready(function(){
+    Pig.ContentPackages.initForm();
+    $( ".autocomplete-select" ).combobox();
+  });
+
+
+.container.page-margin-bottom
+  .row
+    .col-xs-12
+      .cms-page-header
+        %h1=title "New content"
+
+  .row
+    .col-md-8.col-md-offset-2
+      .form-container
+        =semantic_form_for [pig, :admin, @content_package] do |form|
+          =form.inputs do
+            =form.input :parent_id, :as => :hidden
+            =form.input :name, :placeholder => "Select a name for your content"
+            =form.input :content_type, :as => :select, :collection => @content_types, :label => "Select a template", :required => false, :input_html => { :class => "autocomplete-select", :placeholder => "Start typing to search"}
+
+            %button.collapse-trigger{"aria-expanded" => "false", "data-target" => "#collapseContext", "data-toggle" => "collapse", :type => "button"}
+              Add Context
+              %i.fa.fa-caret-down.pull-right
+
+            #collapseContext.collapse
+              %p.lead Write an objective/goal for this content
+              .cms-edit-context-box
+                =form.input :notes, :label => 'Content objective/goal', :input_html => {:rows => 4}, :class => "content-objective-goal"
+
+            %button.collapse-trigger{"aria-expanded" => "false", "data-target" => "#collapseAudience", "data-toggle" => "collapse", :type => "button"}
+              Select the intended audience for this content
+              %i.fa.fa-caret-down.pull-right
+
+            #collapseAudience.collapse
+              =form.inputs do
+                -Pig::PersonaGroup.all.each do |group|
+                  .persona-group-select
+                    %h4.col-primary.cms-edit-group-title=group
+                    =form.input :personas, :as => :check_boxes, :collection => group.personas, :label => false, :member_label => :to_s
+
+            %button.collapse-trigger{"aria-expanded" => "false", "data-target" => "#collapseAuthor", "data-toggle" => "collapse", :type => "button"}
+              Assign author
+              %i.fa.fa-caret-down.pull-right
+
+            #collapseAuthor.collapse
+              =form.inputs do
+                -# TODO permissions
+                =form.input :requested_by, :collection => Pig::User.where(role: ['developer', 'admin', 'editor']).order('LOWER(last_name)')
+                =form.input :author, :collection => Pig::User.order('LOWER(last_name)').where("role<>''").map { |u| ["#{u.full_name} (#{u.role})", u.id] }
+                =form.input :due_date, :order => [:day, :month, :year], :include_blank => false, :start_year => Date.today.year
+                =form.input :review_frequency, :as => :radio, :collection => Pig::ContentPackage.review_frequencies.invert
+
+            =form.action :submit, :label => 'Finish', :wrapper_html => { :class => 'btn btn-success pull-right' }

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'pig/content_types/index', type: :view do
+RSpec.describe 'pig/admin/content_types/index', type: :view do
   let(:admin) { FactoryGirl.create(:user, :admin) }
   let(:content_type_1) { FactoryGirl.create(:content_type, name: 'Foo') }
   let(:content_type_2) { FactoryGirl.create(:content_type, name: 'Bar') }

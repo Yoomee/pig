@@ -1,0 +1,51 @@
+.container.cms-main
+  .cms-page-header.cms-page-header-left
+    .row.section-margin
+      .col-sm-2
+        .image-wrapper
+          =image_for(@user, "200x200#")
+      .col-sm-7
+        %h3.mt-0=title(cell('pig/user', @user))
+        .col-sm-2.p0
+          .label.upper Status
+          =@user.active ? 'Active' : 'Inactive'
+        .col-sm-6.col-xs-12.p0
+          .label.upper Email
+          =link_to(@user.email, 'mailto:'+ @user.email)
+        .col-sm-2.p0
+          .label.upper Role
+          -if @user.role.present?
+            =@user.role.to_s.humanize
+          -else
+            - if can?(:edit, @user)
+              =link_to("Set a role for this user", pig.edit_admin_manage_user_path(@user))
+        .clearfix.section-margin
+        .label.upper Biography
+        -if @user.bio.present?
+          =@user.bio
+        -else
+          - if can?(:edit, @user)
+            =link_to("Write a bio for this user", pig.edit_admin_manage_user_path(@user))
+      .col-md-3
+        -if can?(:edit, @user)
+          =link_to("Edit user", pig.edit_admin_manage_user_path(@user) ,:class => 'btn btn-success  pull-right')
+        .btn.pull-right=link_to('See all users', pig.admin_manage_users_path)
+    -if @assigned_content.present?
+      .row.section-margin
+        .col-xs-12
+          .allocated_content
+            %table.cms-table
+              %thead
+                %tr
+                  %th.text-left{colspan: 4}
+                    Content assigned to
+                    =cell('pig/user', @user)
+              %tbody
+                -@assigned_content.each do |content_package|
+                  %tr
+                    %td.table-page
+                      =content_package.name
+                    %td.table-action
+                      =link_to('View', pig.content_package_path(content_package), :class => 'btn btn-xs btn-default') unless content_package.viewless? || content_package.missing_view?
+                      -if can? :edit, content_package
+                        =link_to('Edit', pig.edit_admin_content_package_path(content_package), :class => 'btn btn-xs btn-success')

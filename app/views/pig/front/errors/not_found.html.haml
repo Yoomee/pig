@@ -1,0 +1,9 @@
+.container-no-child-cols.error-page
+  .col-sm-8.col-sm-offset-2.text-center
+    %h1.error-title 404
+    %p.lead This page has been moved or doesn't exist any more
+    %hr.error-page__divider
+    = render 'pig/front/errors/link_to_old_site'
+    %p.error-page__text
+      You can try using the links in the site nav or back to the
+      =link_to('homepage', '/')

@@ -1,3 +1,3 @@
 When(/^I visit the dashboard$/) do
-  visit pig.content_path
+  visit pig.admin_content_path
 end

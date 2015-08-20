@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module Pig
-  RSpec.describe Manage::UsersController, type: :controller do
+  RSpec.describe Admin::Manage::UsersController, type: :controller do
     render_views
     routes { Pig::Engine.routes }
 
@@ -12,7 +12,7 @@ module Pig
         let(:user) { FactoryGirl.create(:user) }
         it "redirects to user" do
           patch :update, id: user.id, user: { bio: 'Hi my name is test' }
-          expect(response).to redirect_to(manage_user_path(user))
+          expect(response).to redirect_to(admin_manage_user_path(user))
         end
 
         it "updates bio" do

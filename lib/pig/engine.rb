@@ -8,7 +8,7 @@ module Pig
       end
       # Make all main app helpers available to the content packages controller
       # for use in the content type views
-      Pig::ContentPackagesController.helper Rails.application.helpers
+      Pig::Admin::ContentPackagesController.helper Rails.application.helpers
     end
 
     config.generators do |g|

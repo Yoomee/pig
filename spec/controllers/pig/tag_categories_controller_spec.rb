@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module Pig
-  RSpec.describe TagCategoriesController, type: :controller do
+  RSpec.describe Admin::TagCategoriesController, type: :controller do
     routes { Pig::Engine.routes }
     render_views
 
@@ -44,7 +44,7 @@ module Pig
       requests.each do |request|
         it 'should redirect #{request} to not authorized page' do
           eval(request)
-          expect(response).to redirect_to(not_authorized_path)
+          expect(response).to redirect_to(admin_not_authorized_path)
         end
       end
     end
@@ -101,7 +101,7 @@ module Pig
 
           it 'redirects to the created tag_category' do
             post :create, { tag_category: valid_attributes }, valid_session
-            expect(response).to redirect_to(tag_categories_path)
+            expect(response).to redirect_to(admin_tag_categories_path)
           end
         end
 
@@ -140,7 +140,7 @@ module Pig
           it 'redirects to the tag_category' do
             tag_category = TagCategory.create! valid_attributes
             put :update, { id: tag_category.to_param, tag_category: valid_attributes }, valid_session
-            expect(response).to redirect_to(tag_categories_path)
+            expect(response).to redirect_to(admin_tag_categories_path)
           end
 
           it 'deletes taggings that are not used' do

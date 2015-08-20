@@ -1,0 +1,82 @@
+-content_for :head do
+  :javascript
+    $(".nested-fields").sortable({
+      containment: "parent",
+      stop: function(event, ui) {
+        alert('done');
+      }
+    });
+    $(document).ready(function(){
+      $('form.content_type')
+        .on('cocoon:after-insert', function(e,added) {
+          if($('.nested-fields:visible').length > 1){
+            added.before($('#add-another-link').html());
+          }
+          $('.nested-fields:visible').each(function(idx){$(this).find('input[name$="[position]"]').val(idx)});
+        })
+        .on("cocoon:before-remove", function(e,removed) {
+          if($('.links:visible').length > 1){
+            removed.next('.links').remove();
+          }
+        })
+        .on("cocoon:after-remove", function(e,removed) {
+          $('.nested-fields:visible').each(function(idx){$(this).find('input[name$="[position]"]').val(idx)});
+        });
+      $("form.content_type").on('change', 'select[name$="[field_type]"]', function(){
+        var inputs = $(this).parents('.nested-fields fieldset.inputs').find('.character-limit-inputs');
+        if(this.value == 'text' || this.value == 'string') {
+          inputs.show();
+        } else {
+          inputs.hide();
+        }
+      });
+    });
+
+=semantic_form_for [pig, :admin, @content_type] do |form|
+  =form.inputs do
+    .row
+      .col-md-4
+        %ul.cms-nav-tabs
+          %li.active
+            =link_to('') do
+              %i.fa.fa-cogs
+              Settings
+        .cms-form-well
+          =form.input :name, :label => 'Template name'
+          -if can? :manage_description, @content_type
+            =form.input :description, :label => "Content objective/goal", :input_html => {:rows => 4}
+          -if can? :manage_package_name, @content_type
+            =form.input :package_name
+          -if can? :manage_view_name, @content_type
+            =form.input :view_name
+          -if can?(:manage_viewless, @content_type) || can?(:manage_singleton, @content_type)
+            .form-group
+              %h4 Advanced
+              .check_boxes.form-group
+                -if can? :manage_viewless, @content_type
+                  =form.input :viewless
+                -if can? :manage_singleton, @content_type
+                  =form.input :singleton
+          -if Pig::configuration.tags_feature
+            .form-group
+              %h4 Tag categories
+              =form.input :tag_categories, as: :check_boxes, :label => false
+      .col-md-8
+        %ul.cms-nav-tabs
+          %li.active
+            =link_to('') do
+              %i.fa.fa-paragraph
+              Fields
+        #content_attributes
+          =form.semantic_fields_for :content_attributes, @content_type.content_attributes.sort_by(&:position) do |content_attribute|
+            =render 'content_attribute_fields', :f => content_attribute
+            .links.text-center
+              =link_to_add_association 'Add another content attribute', form, :content_attributes, :class => 'btn btn-primary', :icon => 'plus'
+              .clearfix
+
+        .row
+          .col-xs-12
+            %hr
+            =form.actions do
+              =form.action :submit, :button_html => {:class => 'btn btn-success pull-right'}
+            .clearfix

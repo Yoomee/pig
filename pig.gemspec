@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'dragonfly-s3_data_store'
   s.add_dependency 'devise'
   s.add_dependency 'haml-rails'
-  s.add_dependency 'config', '1.0.0.beta1'
+  s.add_dependency 'config', '~> 1.0.0'
   s.add_dependency 'jquery-rails'
   s.add_dependency 'jquery-ui-rails'
   s.add_dependency 'bootstrap-sass'
@@ -43,6 +43,10 @@ Gem::Specification.new do |s|
   s.add_dependency 'poltergeist'
   s.add_dependency 'httparty'
   s.add_dependency 'react-rails', '~> 1.0'
+  s.add_dependency 'oauth2'
+  s.add_dependency 'legato'
+  s.add_dependency 'google-api-client'
+  s.add_dependency 'awesome_nested_set'
 
   s.add_development_dependency "pg"
 end

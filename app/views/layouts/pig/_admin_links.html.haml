@@ -10,32 +10,32 @@
                 %i.fa.fa-home
                 %span My content
             %li{:class => @content_packages && !@deleted_content_packages  ? 'active' : nil}
-              =link_to(content_packages_path) do
+              =link_to(pig.admin_content_packages_path) do
                 %i.fa.fa-list
                 %span Page list
             -if can? :manage, Pig::ContentType
               %li{:class => (@content_types && !@activity_items.nil?) ? 'active' : nil}
-                =link_to(content_types_path) do
+                =link_to(pig.admin_content_types_path) do
                   %i.fa.fa-file-text-o
                   %span Templates
             %li{:class => @deleted_content_packages ? 'active' : nil}
-              =link_to(deleted_content_packages_path) do
+              =link_to(pig.deleted_admin_content_packages_path) do
                 %i.fa.fa-trash-o
                 %span Deleted content
             / TODO - Allow trough to insert itself
             -if can? :manage, Pig::MetaDatum
               %li{:class => @meta_data ? 'active' : nil}
-                =link_to(meta_data_path) do
+                =link_to(pig.admin_meta_data_path) do
                   %i.fa.fa-code
                   %span Non CMS meta data
             -if (can? :manage, Pig::TagCategory) #&& (Pig.setup.tags_feature)
               %li{:class => @tag_categories  ? 'active' : nil}
-                =link_to(pig.tag_categories_path) do
+                =link_to(pig.admin_tag_categories_path) do
                   %i.fa.fa-tags
                   %span Tag Management
             -if (can? :manage, Pig::User)
               %li{:class => @users || @user ? 'active' : nil}
-                =link_to(pig.manage_users_path) do
+                =link_to(pig.admin_manage_users_path) do
                   %i.fa.fa-user
                   %span User Management
             %li
@@ -49,15 +49,14 @@
         .dropdown
           =link_to('', '#', 'data-toggle' => 'dropdown', :icon => 'user', :icon_last => true)
           %ul.cms-nav-user-dropdown
-            %li=link_to('Account settings', pig.manage_user_path(current_user), :icon => 'cog', :icon_first => true)
+            %li=link_to('Account settings', pig.admin_manage_user_path(current_user), :icon => 'cog', :icon_first => true)
             %li=link_to('Change password', pig.edit_user_password_path, :icon => 'unlock-alt', :icon_first => true)
             %li=link_to('Sign out', pig.destroy_user_session_path, :method => :delete, :icon => 'sign-out', :icon_first => true)
       -if current_user && @content_package
         -if can? :index, Pig::ContentPackage.new
           .cms-nav-controls
             -if @content_package && (action_name.show? || @show_cms_nav_edit_link)
-              =link_to('Edit this page', edit_content_package_path(@content_package), :class => 'btn btn-success btn-sm') if can?(:update, @content_package)
+              =link_to('Edit this page', pig.edit_admin_content_package_path(@content_package), :class => 'btn btn-success btn-sm') if can?(:update, @content_package)
               .cms-nav-status
                 Status:
                 =@content_package.status
-

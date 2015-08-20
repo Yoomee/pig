@@ -13,13 +13,18 @@ module Pig
       end
     end
 
+    def set(content_package, value)
+      if value.is_a?(Pig::User)
+        super(content_package, value.id)
+      else
+        super(content_package, value)
+      end
+    end
+
     def get(content_package)
       id = content_value(content_package)
-      if Pig::User.exists?(id)
-        Pig::User.find(id)
-      else
-        nil
-      end
+      return unless Pig::User.exists?(id)
+      Pig::User.find(id)
     end
   end
 end

@@ -10,31 +10,6 @@ module Pig
       content_tag(:span, 'Needs design', :class => 'label label-default')
     end
 
-    def parent_content_package_select(form, options = {})
-      Rails.cache.fetch(Pig::ContentPackage.parent_dropdown_cache_key) do
-        options.reverse_merge!(:label => "Parent")
-        current_page = form.object
-        return "" if Pig::ContentPackage.without([current_page] + current_page.children).empty?
-        out = form.label(:parent_id, options[:label], :class => 'control-label')
-        out << content_tag(:div, form.select(:parent_id, content_tag(:option, 'None', :value => '') + parent_content_package_option_tags(current_page)), :class => 'controls')
-        content_tag(:div, out, :class => 'select form-group optional', :id => 'content_package_parent_input')
-      end
-    end
-
-    def parent_content_package_option_tags(current_page, options = {})
-      options.reverse_merge!(:pages => Pig::ContentPackage.root, :indent => 0)
-      parent_pages = options[:pages].without([current_page] + current_page.children)
-      parent_pages.inject('') do |memo, parent_page|
-        ret = "<option value='#{parent_page.id}'"
-        ret << " selected='selected'" if current_page.parent == parent_page
-        ret << ">#{'&nbsp;&minus;&nbsp;' * options[:indent]}#{parent_page}</option>"
-        if parent_page.children.present?
-          ret << parent_content_package_option_tags(current_page, :pages => parent_page.children, :indent => options[:indent] + 1)
-        end
-        memo + ret
-      end.html_safe
-    end
-
     def sitemap_spacers(content_package, parents)
       "".tap do |out|
         parents.each_with_index do |parent, idx|

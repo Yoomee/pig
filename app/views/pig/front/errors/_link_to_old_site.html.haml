@@ -1,0 +1,8 @@
+
+- if Pig::Archive.active?
+  - archive = Pig::Archive.new(request.fullpath)
+  - if archive.exists?
+    %p.error-page__text
+      But you can still access it on the old site
+      =succeed '.' do
+        = link_to('here', archive.uri)

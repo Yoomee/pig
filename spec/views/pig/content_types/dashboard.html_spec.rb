@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "pig/content_types/dashboard", type: :view do
+RSpec.describe "pig/admin/content_types/dashboard", type: :view do
   let(:admin) { FactoryGirl.create(:user, :admin) }
 
   before(:each) do

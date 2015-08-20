@@ -15,7 +15,6 @@ module Pig
     end
 
     describe 'slug' do
-
       it 'cannot be equal to json_content' do
         content_attribute.slug = 'json_content'
         expect(content_attribute).to_not be_valid
@@ -30,9 +29,9 @@ module Pig
 
       it 'cannot conflict with existing method' do
         content_attribute.slug = nil
-        content_attribute.name = 'Test'
+        content_attribute.name = 'Save'
         content_attribute.valid?
-        expect(content_attribute.slug).to_not eq('test')
+        expect(content_attribute.slug).to_not eq('save')
       end
     end
   end

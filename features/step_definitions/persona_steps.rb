@@ -11,7 +11,7 @@ Given(/^there (is|are) (\d+) personas?$/) do |ia,n|
 end
 
 When(/^I go to the list of personas$/) do
-  visit pig.personas_path
+  visit pig.admin_personas_path
 end
 
 Then(/^I see the personas$/) do
@@ -21,7 +21,7 @@ Then(/^I see the personas$/) do
 end
 
 When(/^I fill in the new persona form and submit$/) do
-  visit pig.new_persona_path
+  visit pig.new_admin_persona_path
   @persona = FactoryGirl.build(:persona)
   select(@persona_group.to_s, from: 'Group')
   fill_in('persona_name', :with => @persona.name)
@@ -32,7 +32,7 @@ When(/^I fill in the new persona form and submit$/) do
 end
 
 Then(/^the persona is created$/) do
-  visit pig.personas_path
+  visit pig.admin_personas_path
   expect(page).to have_content(@persona.name)
 end
 
@@ -45,12 +45,12 @@ Then(/^the persona should be destroyed$/) do
 end
 
 When(/^I edit the content package$/) do
-  visit pig.edit_content_package_path(@content_package)
+  visit pig.edit_admin_content_package_path(@content_package)
 end
 
 When(/^I select the persona on the form$/) do
   find(:xpath, "//input[@name='content_package[persona_ids][]' and @value='#{@persona.id}']").set(true)
-  click_button('Save changes')
+  click_button('Save and continue editing')
 end
 
 Then(/^the persona should be applied to the content package$/) do
@@ -80,11 +80,11 @@ Then(/^I should see a link to find out more about the persona$/) do
 end
 
 When(/^I edit the persona$/) do
-  visit(pig.edit_persona_path(@persona))
+  visit(pig.edit_admin_persona_path(@persona))
 end
 
 When(/^I update the persona form and submit$/) do
-  visit pig.edit_persona_path(@persona)
+  visit pig.edit_admin_persona_path(@persona)
   fill_in 'Persona name', with: 'Foo'
   click_button 'Update Persona'
 end

@@ -4,17 +4,22 @@ module Pig
     include Pig::Permalinkable
     include Pig::Concerns::Recordable
 
+    # Because of this issue on awesome_nested_set it is very important that
+    # acts_as_taggable_on comes before acts_as_nested_set
+    # https://github.com/collectiveidea/awesome_nested_set/issues/213
+    acts_as_taggable_on :acts_as_taggable_on_tags
+    acts_as_taggable_on :taxonomy
+    acts_as_nested_set
+
     belongs_to :content_type
-    belongs_to :parent, :class_name => "ContentPackage"
     has_many :content_chunks, -> { includes :content_attribute }
-    has_many :children, -> { where(:deleted_at => nil).order(:position, :id) }, :class_name => "ContentPackage", :foreign_key => 'parent_id'
-    has_many :deleted_children, -> { where("deleted_at IS NOT NULL").order(:position, :id) }, :class_name => "ContentPackage", :foreign_key => 'parent_id'
     has_and_belongs_to_many :personas, class_name: 'Pig::Persona'
     belongs_to :author, :class_name => 'Pig::User'
     belongs_to :requested_by, :class_name => 'Pig::User'
     has_many :sir_trevor_images
+    has_many :deleted_children, -> { where("deleted_at IS NOT NULL").order(:position, :id) }, :class_name => "ContentPackage", :foreign_key => 'parent_id'
 
-    attr_accessor :skip_status_transition
+    attr_accessor :skip_status_transition, :chunk_methods_set
 
     before_create :set_next_review
     before_save :set_status
@@ -28,21 +33,18 @@ module Pig
 
     delegate :content_attributes, :package_name, :view_name, :missing_view?, :viewless?, :to => :content_type
 
-    acts_as_taggable_on :acts_as_taggable_on_tags
-    acts_as_taggable_on :taxonomy
     delegate :tag_categories, to: :content_type
 
     dragonfly_accessor :meta_image
 
-    scope :root, -> { where(:parent_id => nil, :deleted_at => nil).order(:position, :id) }
+    default_scope -> { where(deleted_at: nil).order(:position, :id) }
+    scope :deleted, -> { unscoped.where("deleted_at IS NOT NULL").order("deleted_at DESC") }
     scope :published, -> { where(:status => 'published').where('publish_at <= ? OR publish_at IS NULL', Date.today) }
     scope :expiring, -> { where('next_review < ?', Date.today) }
     scope :without, (lambda do |ids_or_records|
       array = [*ids_or_records].collect{|i| i.is_a?(Integer) ? i : i.try(:id)}.reject(&:nil?)
       array.empty? ? scoped : where(["#{table_name}.id NOT IN (?)", array])
     end)
-
-    after_initialize :build_content_chunk_methods
 
     def build_content_chunk_methods
       return if content_type.nil?
@@ -199,16 +201,6 @@ module Pig
       [parent, parent.try(:parents)].flatten.compact
     end
 
-    def ancestors
-      result = []
-      c = self
-      while c.parent
-        result.unshift(c.parent)
-        c = c.parent
-      end
-      result
-    end
-
     def first_ancestor_with_view
       c = self
       result = nil
@@ -310,45 +302,6 @@ module Pig
       attribute_name.scan(regexes).flatten.compact.first || attribute_name # Default to attribute_name in order to fetch e.g. 'skills'
     end
 
-    def get_value_for_content_attribute(content_attribute, method = nil)
-      content_chunk = content_chunk_for_content_attribute(content_attribute)
-      case content_attribute.field_type
-      when 'boolean'
-        instance_variable_set("@#{content_attribute.slug}".to_sym, content_chunk.try(:value) || false)
-      when 'file', 'image'
-        if method == 'path'
-          content_chunk.try(:file).try(:url)
-        else
-          content_chunk.try(:file)
-        end
-      when 'link'
-        instance_variable_set("@#{content_attribute.slug}".to_sym, content_chunk.try(:value))
-      when 'embeddable'
-        if method == 'url'
-          instance_variable_set("@#{content_attribute.slug}_url".to_sym, content_chunk.try(:value))
-        else
-          instance_variable_set("@#{content_attribute.slug}".to_sym, content_chunk.try(:html).to_s.gsub('http://', 'https://').html_safe)
-        end
-      when 'user'
-        if method == 'id'
-          instance_variable_set("@#{content_attribute.slug}_id".to_sym, content_chunk.try(:raw_value))
-        else
-          instance_variable_set("@#{content_attribute.slug}".to_sym, content_chunk.try(:value))
-        end
-      when 'location'
-        if method == 'lat_lng'
-          instance_variable_set("@#{content_attribute.slug}_lat_lng".to_sym, content_chunk.try(:html).split(',').map { |e| e.to_f  })
-        else
-          instance_variable_set("@#{content_attribute.slug}".to_sym, content_chunk.try(:value))
-        end
-      when 'rich'
-        instance_variable_set("@#{content_attribute.slug}".to_sym, content_chunk.try(:value))
-      else
-        instance_variable_set("@#{content_attribute.slug}".to_sym, content_chunk.try(:value).try(:html_safe))
-      end
-
-    end
-
     def required_attributes
       return true if new_record? || content_type.nil?
       content_attributes.each do |content_attribute|
@@ -384,52 +337,16 @@ module Pig
       end
     end
 
-    def set_value_for_content_attribute(content_attribute, value, method = nil)
-      content_chunk = content_chunk_for_content_attribute(content_attribute, true)
-      case content_attribute.field_type
-      when 'boolean'
-        content_chunk.value = [0, "0", false, "false", "", nil].include?(value) ? '0' : '1'
-      when 'file', 'image'
-        content_chunk.file = value
-      when 'link'
-        content_chunk.value = value.to_s
-      when 'embeddable'
-        if method == 'url'
-          content_chunk.value = value
-        else
-          content_chunk.html = html
-        end
-      when 'location'
-        if method == 'lat_lng'
-          content_chunk.html = html
-        else
-          content_chunk.value = value
-        end
-      when 'user'
-        if method == 'id'
-          content_chunk.value = value
-        else
-          content_chunk.value = value.try(:id)
-        end
-      when 'rich'
-        #strip out leading and trailing <p><br></p>
-        data = JSON.parse(value)["data"]
-        data.each do |block|
-          if block["type"] == 'text'
-            st = block["data"]["text"].gsub('<p><br></p>', '')
-            block["data"]["text"] = st
-          end
-          # Sir Trevor wraps lists in <ul> tags when editing, remove them here else nested list hell occurs
-          if block["type"] == 'list'
-            st = block["data"]["text"].gsub('<ul>', '').gsub('</ul>', '')
-            block["data"]["text"] = st
-          end
-        end
-        content_chunk.value = JSON.generate({"data" => data})
-      else
-        content_chunk.value = value
+    def method_missing(method_sym, *arguments, &block)
+      unless chunk_methods_set
+        self.build_content_chunk_methods
+        chunk_methods_set = true
       end
-      instance_variable_set("@#{content_attribute.slug}".to_sym, content_chunk.value) unless %w{file image user}.include?(content_attribute.field_type)
+      if self.respond_to?(method_sym)
+        send(method_sym, *arguments)
+      else
+        super(method_sym, *arguments, &block)
+      end
     end
 
   end

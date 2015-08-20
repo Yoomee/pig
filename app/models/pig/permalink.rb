@@ -48,6 +48,10 @@ module Pig
       end
     end
 
+    def to_param
+      full_path.gsub!(/^\//, '')
+    end
+
     private
     def create_inactive_permalink
       return unless path_changed? || full_path_changed?

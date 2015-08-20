@@ -107,8 +107,7 @@ Scenario Outline: Destroying a content package
   Given I am logged in as an <role>
   And there is 1 deleted content package
   When I destroy the content package
-  And I try go to the deleted content package
-  Then I should get a 404
+  Then It shouldn't appear in the list of deleted content packages
   Examples:
     | role      |
     | developer |
