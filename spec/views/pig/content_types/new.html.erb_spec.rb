@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "pig/content_types/new", type: :view do
+RSpec.describe "pig/admin/content_types/new", type: :view do
   let(:admin) { FactoryGirl.create(:user, :admin) }
 
   before(:each) do
@@ -12,7 +12,7 @@ RSpec.describe "pig/content_types/new", type: :view do
   it "renders new content_type form" do
     render
 
-    assert_select "form[action=?][method=?]", pig.content_types_path, "post" do
+    assert_select "form[action=?][method=?]", pig.admin_content_types_path, "post" do
     end
   end
 end

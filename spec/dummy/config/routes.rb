@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount Pig::Engine, at: 'admin'
+  mount Pig::Engine, at: '/'
 end

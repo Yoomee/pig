@@ -1,5 +1,5 @@
 When(/^I destroy the content type$/) do
-  visit pig.content_types_path
+  visit pig.admin_content_types_path
   @deleted_content_type_id = @content_type.id
   within "tr#content-type-#{@content_type.id}" do
     click_link 'More'
@@ -16,7 +16,7 @@ Then(/^I can see the content template it is using$/) do
   content_type = @content_package.content_type
   expect(page).to have_link(
     content_type.name,
-    href: pig.edit_content_type_path(content_type)
+    href: pig.edit_admin_content_type_path(content_type)
   )
 end
 

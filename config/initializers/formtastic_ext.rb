@@ -39,8 +39,12 @@ module Formtastic
   end
 end
 
-FormtasticBootstrap::Inputs::DateSelectInput::FRAGMENT_CLASSES = {
-  :year   => "col-xs-4",
-  :month  => "col-xs-4",
-  :day    => "col-xs-4"
-}
+FormtasticBootstrap::Inputs::DateSelectInput.send(:remove_const,
+                                                  'FRAGMENT_CLASSES')
+FormtasticBootstrap::Inputs::DateSelectInput.send(:const_set,
+                                                  'FRAGMENT_CLASSES',
+                                                  {
+                                                    :year   => "col-xs-4",
+                                                    :month  => "col-xs-4",
+                                                    :day    => "col-xs-4"
+                                                  })

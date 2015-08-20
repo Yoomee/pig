@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "pig/content_types/_form", type: :view do
+RSpec.describe "pig/admin/content_types/_form", type: :view do
   let(:content_type) { FactoryGirl.create(:content_type) }
   let(:tag_categories) { [FactoryGirl.create(:tag_category), FactoryGirl.create(:tag_category)] }
 

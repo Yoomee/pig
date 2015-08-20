@@ -1,5 +1,5 @@
 When(/^I go to the new meta data page$/) do
-  visit pig.new_meta_datum_path
+  visit pig.new_admin_meta_datum_path
 end
 
 When(/^I fill in the meta data form$/) do
@@ -24,7 +24,7 @@ Given(/^that there (?:is|are) (\d+) meta data pages?$/) do |x|
 end
 
 When(/^I go to the meta data page$/) do
-  visit pig.meta_datum_path(@meta_data)
+  visit pig.admin_meta_datum_path(@meta_data)
 end
 
 When(/^I update the meta data$/) do
@@ -43,7 +43,7 @@ Then(/^the meta data should be updated$/) do
 end
 
 When(/^I go to the meta data index page$/) do
-  visit pig.meta_data_path
+  visit pig.admin_meta_data_path
 end
 
 Then(/^I see all the meta data pages$/) do

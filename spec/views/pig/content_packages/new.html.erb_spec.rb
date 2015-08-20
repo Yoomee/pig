@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module Pig
-  RSpec.describe "pig/content_packages/new", type: :view do
+  RSpec.describe "pig/admin/content_packages/new", type: :view do
     it "should order requested by surname, regardless of role" do
       user_c = FactoryGirl.create(:user, :admin, last_name: 'C', first_name: 'C')
       user_b = FactoryGirl.create(:user, :admin, last_name: 'B', first_name: 'B')

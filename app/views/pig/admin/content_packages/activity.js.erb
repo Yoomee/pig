@@ -1,0 +1,8 @@
+<%- @activity_items.each do |activity| %>
+  $(".cms-activities").append("<%= escape_javascript(render('activity', :activity => activity, :include_name => true)) %>");
+<%- end %>
+<% if @activity_items.total_pages == @activity_items.current_page %>
+  $(".js-older-activities").remove();
+  <% else %>
+  $(".js-older-activities").attr('href', "<%= pig.activity_admin_content_packages_path(:page => @page) %>")
+<% end %>

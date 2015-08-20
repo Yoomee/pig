@@ -1,0 +1,26 @@
+.container.page-margin-bottom
+  =render('sitemap_header', header_title: 'Deleted content')
+  .row
+    .col-xs-12
+      .tab-content.tab-content-sitemap
+        #deleted.tab-pane.active
+          %table.cms-table
+            %thead
+              %tr
+                %th.text-left{:class => "col-md-#{current_user.admin? ? 8 : 9}"}
+                  Name
+                %th.text-left{:colspan => current_user.admin? ? 3 : 2}
+                  Deleted
+            %tbody
+              -@deleted_content_packages.each do |content_package|
+                %tr{ id: "deleted-content-package-#{content_package.id}"}
+                  %td=content_package
+                  %td
+                    =time_ago_in_words(content_package.deleted_at)
+                    ago
+                  %td
+                    =link_to('Restore', pig.restore_admin_content_package_path(content_package), :method => :put, :data => {:confirm => content_package.restore_warning})
+                  -if can? :destroy, content_package
+                    %td
+                      =link_to('Destroy', pig.admin_content_package_path(content_package), :method => :delete, :data => {:confirm => "Are you sure you want to destroy this content package?\n\rTHERE IS NO UNDO!"})
+          =will_paginate(@deleted_content_packages)

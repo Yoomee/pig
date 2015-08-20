@@ -1,0 +1,25 @@
+:javascript
+  $(document).ready(function() {
+    $('.select2-selection__choice__remove').click(function(e) {
+      var opt = $('#tag_category_taxonomy_list').find('option[value="'+$(this).parent().attr('title')+'"]');
+      var count = opt.data('count');
+      if (count > 0)
+        if (!confirm("There are " + count + " content packages using this tag. Deleting the tag will remove the tag from those packages."))
+        {
+          e.stopPropagation();
+        }
+    });
+  });
+
+.container.page-margin-bottom
+  .row
+    .col-sm-8.col-sm-offset-2
+      .cms-form-well
+        =semantic_form_for [pig, :admin, @tag_category] do |f|
+          =f.inputs do
+            =f.input :name, hint: 'This can be anything you like'
+            =f.input :slug, label: "Unique identifier", hint: 'Try and make this the same as the name'
+            =f.input :taxonomy_list, as: :select, collection: options_for_select(Pig::TagCategory.tag_counts_on("taxonomy").map { |tag| [tag.name, tag.name, data: {count: @tag_category.tag_count_for(tag)}] }, @tag_category.taxonomy.collect(&:name)), multiple: true, input_html: { class: 'select2' }
+          =f.actions do
+            =f.action :submit, label: 'Save', :button_html => {:class => 'btn btn-success pull-right'}
+            .clearfix

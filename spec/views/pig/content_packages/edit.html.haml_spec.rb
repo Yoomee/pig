@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module Pig
-  RSpec.describe 'pig/content_packages/edit', type: :view do
+  RSpec.describe 'pig/admin/content_packages/edit', type: :view do
     let(:admin) { FactoryGirl.create(:user, :admin, last_name: 'A', first_name: 'A') }
 
     before(:each) do

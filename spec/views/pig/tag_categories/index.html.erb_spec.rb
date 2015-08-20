@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'pig/tag_categories/index', type: :view do
+RSpec.describe 'pig/admin/tag_categories/index', type: :view do
   let(:tag_category_1) { FactoryGirl.create(:tag_category, name: 'Foo') }
   let(:tag_category_2) { FactoryGirl.create(:tag_category, name: 'Bar') }
 
@@ -18,11 +18,11 @@ RSpec.describe 'pig/tag_categories/index', type: :view do
   end
 
   it 'has a link to create a new tag category' do
-    expect(rendered).to have_link('New Tag Category', href: pig.new_tag_category_path)
+    expect(rendered).to have_link('New Tag Category', href: pig.new_admin_tag_category_path)
   end
 
   it 'has a link to edit a tag category' do
-    expect(rendered).to have_link('Foo', href: pig.edit_tag_category_path(tag_category_1))
-    expect(rendered).to have_link('Bar', href: pig.edit_tag_category_path(tag_category_2))
+    expect(rendered).to have_link('Foo', href: pig.edit_admin_tag_category_path(tag_category_1))
+    expect(rendered).to have_link('Bar', href: pig.edit_admin_tag_category_path(tag_category_2))
   end
 end

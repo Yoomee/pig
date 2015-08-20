@@ -1,0 +1,11 @@
+.row
+  .col-xs-12
+    .cms-page-header
+      .row
+        .col-sm-6.col-sm-offset-3.greg
+          %h1=title(header_title)
+        .col-sm-3.cms-header-actions
+          -if (@content_packages && !@deleted_content_packages) && can?(:update, @article)
+            =link_to("Add new content", pig.new_admin_content_package_path, :icon => 'plus', :class => 'btn btn-success')
+          -if @content_types && can?(:new, Pig::ContentType.new)
+            =link_to("Add new template", pig.new_admin_content_type_path, :icon => 'plus', :class => 'btn btn-success')

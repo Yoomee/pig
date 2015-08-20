@@ -6,6 +6,7 @@ module Pig
                   :redactor_plugins,
                   :cms_roles,
                   :unpublished,
+                  :not_found,
                   :additional_stylesheets,
                   :additional_javascripts,
                   :homepage,
@@ -17,7 +18,8 @@ module Pig
       self.tags_feature = options[:tags_feature] || true
       self.basic_redactor_plugins = options[:basic_redactor_plugins] || []
       self.redactor_plugins = options[:redactor_plugins] || []
-      self.unpublished = options[:homepage] || proc { redirect_to(pig.new_user_session_path) }
+      self.unpublished = options[:unpublished] || proc { render template: 'pig/front/errors/not_found', layout: 'application', status: '404' }
+      self.not_found = options[:not_found] || proc { render template: 'pig/front/errors/not_found', layout: 'application', status: '404' }
       self.additional_stylesheets = options[:additional_stylesheets] || []
       self.additional_javascripts = options[:additional_javascripts] || []
       self.homepage = options[:homepage] || proc { Pig::ContentPackage.first }

@@ -1,28 +1,27 @@
 module Pig
   class Archive
-    def initialize(request)
-      @request = request
+
+    def self.active?
+      self.domain.present?
     end
 
-    def active?
-      domain.present?
-    end
-
-    def domain
-      Pig.configuration.archive_domain
+    def initialize(path)
+      @path = path
     end
 
     def exists?
       HTTParty.get(uri).success?
     end
 
-    def path
-      request_uri = @request.env['REQUEST_URI']
-      request_uri.gsub(@request.base_url, '')
+    def uri
+      Pig::Archive.domain + @path
     end
 
-    def uri
-      domain + path
+    private
+
+    def self.domain
+      Pig.configuration.archive_domain
     end
+
   end
 end

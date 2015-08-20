@@ -4,15 +4,20 @@ module Pig
     include Pig::Permalinkable
     include Pig::Concerns::Recordable
 
+    # Because of this issue on awesome_nested_set it is very important that
+    # acts_as_taggable_on comes before acts_as_nested_set
+    # https://github.com/collectiveidea/awesome_nested_set/issues/213
+    acts_as_taggable_on :acts_as_taggable_on_tags
+    acts_as_taggable_on :taxonomy
+    acts_as_nested_set
+
     belongs_to :content_type
-    belongs_to :parent, :class_name => "ContentPackage"
     has_many :content_chunks, -> { includes :content_attribute }
-    has_many :children, -> { where(:deleted_at => nil).order(:position, :id) }, :class_name => "ContentPackage", :foreign_key => 'parent_id'
-    has_many :deleted_children, -> { where("deleted_at IS NOT NULL").order(:position, :id) }, :class_name => "ContentPackage", :foreign_key => 'parent_id'
     has_and_belongs_to_many :personas, class_name: 'Pig::Persona'
     belongs_to :author, :class_name => 'Pig::User'
     belongs_to :requested_by, :class_name => 'Pig::User'
     has_many :sir_trevor_images
+    has_many :deleted_children, -> { where("deleted_at IS NOT NULL").order(:position, :id) }, :class_name => "ContentPackage", :foreign_key => 'parent_id'
 
     attr_accessor :skip_status_transition
 
@@ -28,13 +33,12 @@ module Pig
 
     delegate :content_attributes, :package_name, :view_name, :missing_view?, :viewless?, :to => :content_type
 
-    acts_as_taggable_on :acts_as_taggable_on_tags
-    acts_as_taggable_on :taxonomy
     delegate :tag_categories, to: :content_type
 
     dragonfly_accessor :meta_image
 
-    scope :root, -> { where(:parent_id => nil, :deleted_at => nil).order(:position, :id) }
+    default_scope -> { where(deleted_at: nil).order(:position, :id) }
+    scope :deleted, -> { unscoped.where("deleted_at IS NOT NULL").order("deleted_at DESC") }
     scope :published, -> { where(:status => 'published').where('publish_at <= ? OR publish_at IS NULL', Date.today) }
     scope :expiring, -> { where('next_review < ?', Date.today) }
     scope :without, (lambda do |ids_or_records|
@@ -197,16 +201,6 @@ module Pig
 
     def parents
       [parent, parent.try(:parents)].flatten.compact
-    end
-
-    def ancestors
-      result = []
-      c = self
-      while c.parent
-        result.unshift(c.parent)
-        c = c.parent
-      end
-      result
     end
 
     def first_ancestor_with_view

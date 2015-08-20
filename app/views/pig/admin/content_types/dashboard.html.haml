@@ -1,0 +1,57 @@
+.container.page-margin-bottom
+  .row
+    .col-xs-12
+      %h1.cms-page-header=title 'Content dashboard'
+  .row
+    .col-md-8
+      .cms-well
+        %h2.h3 Content status
+        .row
+          .col-md-4
+            =link_to pig.filter_admin_content_packages_path(:filter => 'draft'), :class => "btn btn-block btn-primary" do
+              %span.btn-number
+                =Pig::ContentPackage.where(:status => 'draft').count
+              Draft
+          .col-md-4
+            =link_to pig.filter_admin_content_packages_path(:filter => 'pending'), :class => "btn btn-block btn-success" do
+              %span.btn-number
+                =Pig::ContentPackage.where(:status => 'pending').count
+              Ready to review
+          .col-md-4
+            =link_to pig.filter_admin_content_packages_path(:filter => 'expiring'), :class=>"btn btn-block btn-error" do
+              %span.btn-number
+                =Pig::ContentPackage.expiring.count
+              Getting old
+      -if current_user && Pig::ContentPackage.where(:author_id => current_user.try(:id)).count.nonzero?
+        .cms-well.clearfix.table-cms-dashboard
+          %h2.h3 Content assigned to you
+          %table.cms-table
+            %thead
+              %tr
+                %th Content name
+                %th Status
+                %th Due date
+                %th
+                  .text-right Actions
+            -@my_content.each do |content_package|
+              %tr
+                %td=content_package
+                %td=status(content_package.status)
+                %td=content_package.due_date.try(:strftime, '%b %d, %Y')
+                %td.text-right
+                  -if !content_package.missing_view?
+                    =link_to "View", content_package, :class => "btn btn-xs"
+                  =link_to "Edit", pig.edit_admin_content_package_path(content_package), :class => "btn btn-xs btn-success"
+      .cms-well.clearfix.fadeInSlow3
+        %h2.h3 Recent Activity
+        %ul.cms-activity-feed.cms-activities
+          -@activity_items.each do |activity|
+            =render("pig/admin/content_packages/activity", :include_name => true, :activity => activity)
+        .text-center=link_to "See older activity", pig.activity_admin_content_packages_path, :remote => true, :class => 'btn btn-sm js-older-activities', :icon => 'angle-double-down', :icon_last => true
+
+    .col-md-4
+      .cms-well
+        =link_to("Create new content", pig.new_admin_content_package_path, :class => 'btn btn-success btn-block') if can? :new, Pig::ContentPackage
+        =link_to("Content list", pig.admin_content_packages_path, :class => 'btn btn-primary btn-block') if can? :read, Pig::ContentPackage
+        =link_to("Users & permissions", pig.admin_manage_users_path, :class => 'btn btn-primary btn-block')# TODO if can? :read,
+        =link_to("Manage personas", pig.admin_personas_path, :class => 'btn btn-primary btn-block') if can? :manage, Pig::Persona

@@ -1,0 +1,36 @@
+.container.page-margin-bottom
+  .row
+    .col-md-12
+      .row
+        .col-md-10
+          %h3
+            =link_to('All', pig.admin_meta_data_path, icon: 'arrow-left')
+          %h2
+            Meta data for
+            =@meta_datum
+        .col-md-2
+          -if can?(:edit, @meta_datum)
+            =link_to('Edit', pig.edit_admin_meta_datum_path(@meta_datum), class: 'btn btn-primary')
+          -if can?(:destroy, @meta_datum)
+            =link_to('Delete', pig.admin_meta_datum_path(@meta_datum), confirm: 'Are you sure?', class: 'btn btn-danger', method: :delete)
+      %table.cms-table
+        %tr
+          %td
+            Title:
+          %td
+            =@meta_datum.title
+        %tr
+          %td
+            Description:
+          %td
+            =@meta_datum.description
+        %tr
+          %td
+            Keywords:
+          %td
+            =@meta_datum.keywords
+        %tr
+          %td
+            Image:
+          %td
+            =image_for(@meta_datum, '300x300#', class: 'ml-0') if @meta_datum.image

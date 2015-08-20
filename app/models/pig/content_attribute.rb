@@ -96,7 +96,7 @@ module Pig
 
     def resource_collection
       # ContentPackage collection for atrributes of type resource
-      resource_content_type.nil? ? ContentPackage.published : ContentPackage.where(content_type: resource_content_type).published
+      resource_content_type.nil? ? Pig::ContentPackage.published : Pig::ContentPackage.where(content_type: resource_content_type).published
     end
 
     def limitable?
@@ -150,14 +150,13 @@ module Pig
     end
 
     def set_slug
-      if slug.blank? && name.present? && errors['name'].blank?
-        slug_name = name.gsub('-',' ').parameterize("_").sub(/^\d+/,'n')
-        if Pig::ContentPackage.new().respond_to_without_content_attributes?(slug_name,true)
-          slug_name = 'content_package_' + slug_name
-        end
-        self.slug = slug_name
-        valid?
+      return unless slug.blank? && name.present? && errors['name'].blank?
+      slug_name = name.gsub('-', ' ').parameterize('_').sub(/^\d+/, 'n')
+      if Pig::ContentPackage.new.respond_to?(slug_name)
+        slug_name = 'content_package_' + slug_name
       end
+      self.slug = slug_name
+      valid?
     end
 
   end

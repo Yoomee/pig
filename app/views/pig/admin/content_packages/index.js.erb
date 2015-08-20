@@ -1,0 +1,8 @@
+$('#content-packages-list').html("<%=j render partial: 'content_package', collection: @content_packages %>");
+$('#content-package-<%= params[:open] %>').addClass('highlight');
+
+if ($('.highlight').length) {
+  $('html, body').animate({
+    scrollTop: $('.highlight').offset().top - 100
+  }, 800);
+}

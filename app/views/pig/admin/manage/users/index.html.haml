@@ -1,0 +1,45 @@
+:javascript
+  $(document).ready(function() {
+    window.userFilter().init();
+  });
+.container
+  .row
+    .col-xs-12
+      .cms-page-header
+        .row
+          .col-sm-6.col-sm-offset-3
+            %h1=title("Users")
+          .col-sm-3.cms-header-actions
+            -if can? :new, Pig::User
+              =link_to("Add new user", pig.new_admin_manage_user_path, :icon => 'plus', :class => 'btn btn-success')
+.container.page-margin-bottom
+  .col-md-12
+
+    %table.cms-table.users-table
+      %thead
+        %tr
+          %th Name
+          %th Role
+          %th.filter-control
+            .sitemap-filter.pull-right
+              %strong Filter
+              &nbsp;
+              =select_tag(:role, options_for_select([['All', nil]] + Pig::User.available_roles, params[:filter]), :class => 'noselectpicker')
+            %label.pull-right.m0
+              =check_box_tag :show_inactive, '', @show_inactive
+              Include inactive users
+      %tbody
+        -@users.each do |user|
+          %tr.user-row{'data_user-id' => user.id, :class => "role-#{user.role} " + (user.active ? 'active' : 'inactive')}
+            %td.user-name
+              =link_to(user.full_name, pig.admin_manage_user_path(user))
+            %td.user-role
+              =user.role.to_s.humanize
+
+            %td.user-actions
+              =link_to('Edit', pig.edit_admin_manage_user_path(user), class: 'btn btn-xs btn-success edit-user-btn')
+              - if user.active
+                = react_component('DeactivateUserButton', deactivateUrl: pig.deactivate_admin_manage_user_path(user), contentUrl: pig.content_admin_manage_user_path(user, format: :json), userId: user.id, users: Pig::User.all.reject{ |u| u == user }.to_json(methods: [:full_name]))
+              - else
+                =link_to('Reactivate', pig.set_active_admin_manage_user_path(user), method: :post, class: "btn btn-xs set-active-btn btn-warning" , :data => {:confirm => "Are you sure you want to activate this user?"})
+              =link_to('Delete', pig.admin_manage_user_path(user), method: :delete, data: {confirm: 'Are you sure? This user will be permanently removed and cannot be restored.'}, remote: true,class: 'btn btn-xs btn-error delete-user-btn')

@@ -7,7 +7,7 @@ module Pig
       user = FactoryGirl.create(:user, role: 'admin')
       allow_any_instance_of(Devise::Controllers::Helpers).to receive(:current_user).and_return(user)
       render
-      expect(rendered).to have_link("Account settings", href: pig.edit_manage_user_path(user))
+      expect(rendered).to have_link("Account settings", href: pig.edit_admin_manage_user_path(user))
     end
   end
 end

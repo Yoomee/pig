@@ -11,7 +11,7 @@ Given(/^there (is|are) (\d+) content types?$/) do |ia,n|
 end
 
 When(/^I go to the list of content types$/) do
-  visit pig.content_types_path
+  visit pig.admin_content_types_path
 end
 
 Then(/^I see the content types$/) do
@@ -21,7 +21,7 @@ Then(/^I see the content types$/) do
 end
 
 When(/^I fill in the new content type form and submit$/) do
-  visit pig.new_content_type_path
+  visit pig.new_admin_content_type_path
   @content_type = FactoryGirl.build(:content_type)
   fill_in('content_type_name', :with => @content_type.name)
   @content_type.content_attributes.each_with_index do |content_attribute, idx|
@@ -41,18 +41,18 @@ Then(/^the content type is created$/) do
 end
 
 When(/^I update the content type$/) do
-  visit pig.edit_content_type_path(@content_type)
+  visit pig.edit_admin_content_type_path(@content_type)
   fill_in('content_type_name', :with => 'Modified name')
   click_button("Update Content type")
 end
 
 Then(/^the content type should change$/) do
-  visit pig.edit_content_type_path(@content_type)
+  visit pig.edit_admin_content_type_path(@content_type)
   expect(find_field('content_type[name]').value).to eq('Modified name')
 end
 
 When(/^I duplicate the content type$/) do
-  visit pig.content_types_path
+  visit pig.admin_content_types_path
   within "#content-type-#{@content_type.id}" do
     click_link "More"
     click_link "Duplicate..."
@@ -81,7 +81,7 @@ Then(/^I see a new content type with all the same attributes$/) do
 end
 
 When(/^I duplicate the first content type onto the second$/) do
-  visit pig.duplicate_content_type_path(@content_types.first, :to => @content_types.last)
+  visit pig.duplicate_admin_content_type_path(@content_types.first, :to => @content_types.last)
 end
 
 Then(/^I see a second content type with all the attributes of the first$/) do

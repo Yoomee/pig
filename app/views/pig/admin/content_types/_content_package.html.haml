@@ -1,0 +1,11 @@
+%tr{:data => {:depth => 1}}
+  %td.td-name
+    %span.spacer{:class => "spacer-#{last ? 'last' : 'mid'}"}
+    %span.name=content_package.name
+  %td=link_to('View', content_package) unless content_package.viewless? || content_package.missing_view?
+  %td=link_to('Edit', pig.edit_admin_content_package_path(content_package))
+  %td
+    .dropdown
+      =link_to('More'.html_safe, '#', 'data-toggle' => 'dropdown', :icon => 'angle-down', :icon_last => true)
+      %ul.dropdown-menu.dropdown-menu-right
+        %li=link_to('Reveal in content list', pig.admin_content_packages_path(:open => content_package.id), :title => "Reveal this page in the sitemap")
