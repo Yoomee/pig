@@ -28,6 +28,7 @@ require 'legato'
 require 'google/api_client'
 require 'awesome_nested_set'
 require 'acts_as_commentable'
+require 'paper_trail'
 
 require 'pig/link'
 require 'pig/permalinkable'

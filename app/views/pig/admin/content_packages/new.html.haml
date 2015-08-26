@@ -17,9 +17,9 @@
       .form-container
         =semantic_form_for [pig, :admin, @content_package] do |form|
           =form.inputs do
-            =form.input :parent_id, :as => :hidden
             =form.input :name, :placeholder => "Select a name for your content"
             =form.input :content_type, :as => :select, :collection => @content_types, :label => "Select a template", :required => false, :input_html => { :class => "autocomplete-select", :placeholder => "Start typing to search"}
+            =form.input :parent_id, as: :select, collection: nested_set_options(Pig::ContentPackage, @content_package) {|i| "#{'-' * i.level} #{i.name}" }
 
             %button.collapse-trigger{"aria-expanded" => "false", "data-target" => "#collapseContext", "data-toggle" => "collapse", :type => "button"}
               Add Context
