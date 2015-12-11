@@ -62,6 +62,17 @@ Scenario Outline: Edit a content package
     | admin     |
     | editor    |
 
+Scenario Outline: Edit a nested content package
+  Given I am logged in as an <role>
+  And there is 1 nested content package
+  When I update the content package
+  Then the content package should change
+  Examples:
+    | role      |
+    | developer |
+    | admin     |
+    | editor    |
+
 @javascript
 Scenario Outline: Save and continue editing a content package
   Given I am logged in as an <role>

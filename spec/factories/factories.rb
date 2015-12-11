@@ -98,6 +98,10 @@ FactoryGirl.define do
     sequence(:slug){|n| "content_package_#{n}" }
     editing_user { FactoryGirl.create(:user) }
 
+    factory :nested_content_package do
+      association :parent, factory: :content_package
+    end
+
     factory :viewless_content_package do
       association :content_type, :viewless
     end

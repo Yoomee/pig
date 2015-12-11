@@ -9,7 +9,7 @@ module Pig
         before_save :execute_transition
       end
 
-      class_methods do
+      module ClassMethods
         def statuses(user)
           statuses_for(user, self)
         end
