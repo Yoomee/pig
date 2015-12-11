@@ -24,6 +24,10 @@ Given(/^there (?:is|are) (\d+)\s?(draft|published)?( unpublished)?( archived)? c
   @content_package = @content_packages.first
 end
 
+Given(/^there is 1 nested content package$/) do
+  @content_package = FactoryGirl.create(:nested_content_package)
+end
+
 Given(/^there is (\d+) content package with comments$/) do |arg1|
   @content_package = FactoryGirl.create(:content_package_with_comments)
 end
