@@ -20,7 +20,7 @@ namespace :pig do
 
       request.on_complete do |response|
         pages_tested += 1
-        success = response.return_code == :ok && !response.body.include?('Pig::') && !(response.body =~ /href="\/\d+"/)
+        success = response.response_code == 200 && !response.body.include?('Pig::') && !(response.body =~ /href="\/\d+"/)
 
         failures << permalink unless success
         total_time_taken += response.total_time
