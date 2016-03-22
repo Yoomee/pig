@@ -14,7 +14,7 @@ module Pig
       let!(:content_package_2) { FactoryGirl.create(:content_package) }
 
       it 'orders by created_at descending' do
-        ActivityItem.all.should eq [content_package_2.activity_items.first, content_package_1.activity_items.first]
+        expect(ActivityItem.all).to eq [content_package_2.activity_items.first, content_package_1.activity_items.first]
       end
     end
 

@@ -52,11 +52,11 @@ module Pig
 
       def ready_to_review
         self.author_id = nil
-        ContentPackageMailer.assigned(self, requested_by).deliver
+        ContentPackageMailer.assigned(self, requested_by).deliver_now
       end
 
       def assign_to_author
-        ContentPackageMailer.assigned(self, author).deliver
+        ContentPackageMailer.assigned(self, author).deliver_now
       end
 
     end

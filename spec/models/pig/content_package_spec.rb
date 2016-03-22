@@ -46,7 +46,7 @@ module Pig
         expect{ content_package.title }.not_to raise_error
       end
       it 'should not work for other attributes' do
-        expect{ content_package.title2 }.to raise_error
+        expect{ content_package.title2 }.to raise_error(NoMethodError)
       end
     end
 
@@ -56,7 +56,7 @@ module Pig
         expect(content_package.title).to eq("A new title")
       end
       it 'should not work for other attributes' do
-        expect{ content_package.title2 = "title" }.to raise_error
+        expect{ content_package.title2 = "title" }.to raise_error(NoMethodError)
       end
     end
 
@@ -301,7 +301,7 @@ module Pig
         end
 
         cp_v.permalink_path = 'second'
-        puts cp_v.save
+        cp_v.save
 
         cps.each_with_index do |cp, index|
           cp.reload

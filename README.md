@@ -5,7 +5,7 @@
 Add Pig to your Gemfile:
 
 ```ruby
-gem "pig"
+gem 'pig', git: "https://#{ENV['GITHUB_PIG_TOKEN']}:x-oauth-basic@github.com/yoomee/pig.git", tag: '0.0.7.0'
 ```
 
 Run the bundle command to install it.
@@ -24,6 +24,12 @@ If you take a look in your `config/routes.rb` file you should now see the Pig mo
 ```ruby
 # config/initializers/pig.rb
 config.mount_path = 'admin'
+```
+
+To run the cucumber tests you will need phantomjs, if you're on OSX it can be installed with:
+
+```
+brew install phantomjs
 ```
 
 ### Google Analytics
