@@ -80,6 +80,7 @@ module Pig
       meta_tags << "<meta property=\"og:url\" content=\"#{request.original_url}\" />\n"
       meta_tags << "<meta property=\"twitter:url\" content=\"#{request.original_url}\" />\n"
       meta_tags << "<meta property=\"og:site_name\" content=\"#{Settings.site_name}\"/>\n"
+      meta_tags << "<meta property=\"og:type\" content=\"article\"/>\n"
 
       meta_tags
     end
