@@ -192,6 +192,30 @@ module Pig
 
         @content_package.last_edited_by = current_user
         content_package_params[:author_id]=current_user.id if content_package_params[:author_id].nil? || content_package_params[:author_id].empty?
+        
+        #TODO: clean up this tempory code change
+        #If permalink changed, don't pass the parameter to update_attributes but make the change here
+        if content_package_params[:permalink_path] != @content_package.permalink.path 
+
+          new_permalink_path = content_package_params[:permalink_path]
+          old_permalink =  @content_package.permalinks.active.first
+
+          # Put the params back to how they were
+          content_package_params[:permalink_path] = @content_package.permalink.path
+
+          # Disable the old permalink
+          old_permalink.update_attribute(:active, false)
+
+          # Save new permalink (or update an old version of it)
+          new_permalink_full_path = @content_package.parent.permalink_display_path.chop + "/" + new_permalink_path
+          new_permalink = Permalink.find_or_initialize_by(full_path: new_permalink_full_path)
+          new_permalink.update_attributes(path: new_permalink_path, 
+            resource_id: @content_package.id, 
+            resource_type: "Pig::ContentPackage", 
+            active: true, 
+            full_path:  new_permalink_full_path)
+        end
+
 
         if @content_package.update_attributes(content_package_params)
           flash[:notice] = "Updated \"#{@content_package}\""
