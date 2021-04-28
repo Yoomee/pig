@@ -71,6 +71,17 @@ module Pig
       end
     end
 
+    def full_path
+
+      if Pig.configuration.nested_permalinks && self.parent.respond_to?(:permalink_display_path)
+        link = self.parent.permalink_display_path.chop + "/" + self.permalink_path
+      else
+        link = self.permalink_path
+      end
+      link
+
+    end
+
     class << self
 
       def member_routes
