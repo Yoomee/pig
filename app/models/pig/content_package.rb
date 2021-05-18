@@ -201,7 +201,7 @@ module Pig
       permalink.full_path_without_leading_slash
     end
 
-    def quick_build_permalink
+    def quick_build_permalink!
       return unless permalink.nil?
       permalink = build_permalink
       set_permalink
