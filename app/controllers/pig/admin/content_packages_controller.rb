@@ -192,9 +192,9 @@ module Pig
 
         @content_package.last_edited_by = current_user
         content_package_params[:author_id]=current_user.id if content_package_params[:author_id].nil? || content_package_params[:author_id].empty?
-        
+                
         #If permalink changed, don't pass the parameter to update_attributes but update aliases here
-        if @content_package.permalink && (content_package_params[:permalink_path] != @content_package.permalink.path)
+        if @content_package.permalink && !content_package_params[:permalink_path].nil? && (content_package_params[:permalink_path] != @content_package.permalink.path)
 
           new_permalink_path = content_package_params[:permalink_path]
           old_permalink =  @content_package.permalinks.active.first
