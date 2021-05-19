@@ -14,6 +14,8 @@
 
 %li
   -if activity.resource && !activity.resource.viewless?
+    -if activity.resource.permalink.nil?
+      - activity.resource.quick_build_permalink!
     =link_to "/admin/content_packages/"+CGI.escape(activity.resource.permalink.full_path)+"/edit?compare1=#{activity.created_at.to_i}&compare2=#{activity.next.created_at.to_i}" do
       =activity_html
   -else
