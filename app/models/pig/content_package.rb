@@ -3,7 +3,6 @@ module Pig
 
     include Pig::Permalinkable
     include Pig::Concerns::Recordable
-    include Pig::Concerns::Commentable
     include Pig::Concerns::Workflow
     include Pig::Concerns::Versionable
 
