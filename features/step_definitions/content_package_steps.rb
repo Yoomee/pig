@@ -60,7 +60,7 @@ end
 When(/^it changes parent$/) do
   parent_content_package = FactoryGirl.create(:content_package)
   @inactive_permalink = @content_package.permalink
-  @content_package.update_attributes(:parent_id => parent_content_package.id)
+  @content_package.update(:parent_id => parent_content_package.id)
 end
 
 Then(/^I see the content packages$/) do

@@ -35,7 +35,7 @@ module Pig
       end
 
       def update
-        if @meta_datum.update_attributes(meta_datum_params)
+        if @meta_datum.update(meta_datum_params)
           redirect_to pig.admin_meta_datum_path(@meta_datum), notice: "Updated \"#{@meta_datum}\""
         else
           render :edit, error: "Sorry there was a problem saving this page: #{@meta_datum.errors.full_messages.to_sentence}"

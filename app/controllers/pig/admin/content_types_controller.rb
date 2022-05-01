@@ -71,7 +71,7 @@ module Pig
 
       def update
         params = content_type_params
-        if @content_type.update_attributes(params)
+        if @content_type.update(params)
           redirect_to pig.admin_content_types_path
         else
           flash[:error] = @content_type.errors.full_messages.to_sentence

@@ -41,7 +41,7 @@ module Pig
       end
 
       def update
-        if @persona.update_attributes(persona_params)
+        if @persona.update(persona_params)
           redirect_to pig.admin_personas_path
         else
           render :action => 'edit'

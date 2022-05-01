@@ -49,7 +49,7 @@ module Pig
       end
 
       def update
-        @navigation_item.update_attributes(params[:navigation_item])
+        @navigation_item.update(params[:navigation_item])
         render :action => 'create_update'
       end
 

@@ -36,7 +36,7 @@ module Pig
         end
 
         def update
-          if @user.update_attributes(user_params)
+          if @user.update(user_params)
             sign_in(@user, bypass: true) if @user == current_user
             redirect_to pig.admin_manage_user_path(@user)
           else
