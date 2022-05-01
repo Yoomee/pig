@@ -49,7 +49,6 @@ module Pig
         can [:manage], Pig::ContentPackage
         cannot :destroy,  Pig::ContentPackage
         can [:index, :dashboard, :children], Pig::ContentType
-        can [:create], Pig::Comment
         can [:create, :show], Pig::Permalink
         can :destroy, Pig::Permalink do |permalink|
           instance_exec permalink, &Pig.configuration.can_delete_permalink
@@ -61,7 +60,6 @@ module Pig
         can [:index, :show, :activity, :ready_to_review, :search, :preview], Pig::ContentPackage
         can [:index, :dashboard, :children], Pig::ContentType
         can :contributor_blog_posts, Pig::ContentPackage
-        can [:create], Pig::Comment
         can [:children], Pig::ContentPackage
         can [:index, :edit], Pig::Persona
       end
