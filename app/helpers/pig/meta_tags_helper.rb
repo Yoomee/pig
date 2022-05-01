@@ -32,7 +32,7 @@ module Pig
         if @content_package.hide_from_robots?
           meta_hide_from_robots = "<meta name='robots' content='noindex, nofollow' />\n"
         end
-        [meta_title, meta_description, meta_image, meta_keywords, meta_hide_from_robots]
+        #[meta_title, meta_description, meta_image, meta_keywords, meta_hide_from_robots]
         # end
       elsif meta_data = Pig::MetaDatum.where(page_slug: page_slug).first
         meta_title = meta_data.title || Settings.default_meta_title
@@ -50,37 +50,37 @@ module Pig
       # build actual tags from values
 
       if meta_image.present?
-        meta_tags << "<meta name=\"twitter:card\" content=\"photo\">\n"
+        meta_tags = meta_tags + "<meta name=\"twitter:card\" content=\"photo\">\n"
       else
-        meta_tags << "<meta name=\"twitter:card\" content=\"summary\">\n"
+        meta_tags = meta_tags + "<meta name=\"twitter:card\" content=\"summary\">\n"
       end
 
       if meta_title.present?
-        meta_tags << "<meta itemprop=\"name\" content=\"#{meta_title}\">\n"
-        meta_tags << "<meta name=\"twitter:title\" content=\"#{meta_title}\">\n"
-        meta_tags << "<meta property=\"og:title\" content=\"#{meta_title}\" />\n"
+        meta_tags = meta_tags + "<meta itemprop=\"name\" content=\"#{meta_title}\">\n"
+        meta_tags = meta_tags + "<meta name=\"twitter:title\" content=\"#{meta_title}\">\n"
+        meta_tags = meta_tags + "<meta property=\"og:title\" content=\"#{meta_title}\" />\n"
       end
 
       if meta_description.present?
-        meta_tags << "<meta name=\"description\" content=\"#{meta_description}\">\n"
-        meta_tags << "<meta itemprop=\"description\" content=\"#{meta_description}\">\n"
-        meta_tags << "<meta name=\"twitter:description\" content=\"#{meta_description}\">\n"
-        meta_tags << "<meta property=\"og:description\" content=\"#{meta_description}\" />\n"
+        meta_tags = meta_tags + "<meta name=\"description\" content=\"#{meta_description}\">\n"
+        meta_tags = meta_tags + "<meta itemprop=\"description\" content=\"#{meta_description}\">\n"
+        meta_tags = meta_tags + "<meta name=\"twitter:description\" content=\"#{meta_description}\">\n"
+        meta_tags = meta_tags + "<meta property=\"og:description\" content=\"#{meta_description}\" />\n"
       end
 
       if meta_image.present?
-        meta_tags << "<meta itemprop=\"image\" content=\"#{meta_image}\">\n"
-        meta_tags << "<meta property=\"og:image\" content=\"#{meta_image}\"/>\n"
+        meta_tags = meta_tags + "<meta itemprop=\"image\" content=\"#{meta_image}\">\n"
+        meta_tags = meta_tags + "<meta property=\"og:image\" content=\"#{meta_image}\"/>\n"
       end
 
       if meta_keywords.present? && include_keywords
-        meta_tags << "<meta name=\"keywords\" content=\"#{meta_keywords}\">\n"
+        meta_tags = meta_tags + "<meta name=\"keywords\" content=\"#{meta_keywords}\">\n"
       end
 
-      meta_tags << "<meta property=\"og:url\" content=\"#{request.original_url}\" />\n"
-      meta_tags << "<meta property=\"twitter:url\" content=\"#{request.original_url}\" />\n"
-      meta_tags << "<meta property=\"og:site_name\" content=\"#{Settings.site_name}\"/>\n"
-      meta_tags << "<meta property=\"og:type\" content=\"article\"/>\n"
+      meta_tags = meta_tags + "<meta property=\"og:url\" content=\"#{request.original_url}\" />\n"
+      meta_tags = meta_tags + "<meta property=\"twitter:url\" content=\"#{request.original_url}\" />\n"
+      meta_tags = meta_tags + "<meta property=\"og:site_name\" content=\"#{Settings.site_name}\"/>\n"
+      meta_tags = meta_tags + "<meta property=\"og:type\" content=\"article\"/>\n"
 
       meta_tags
     end
