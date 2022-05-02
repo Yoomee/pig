@@ -205,4 +205,4 @@
               #analytics.tab-pane.cms-well
                 = react_component('ContentPackageAnalytics', analyticsPath: pig.analytics_admin_content_package_path(@content_package), defaultPeriod: 7)
             #discussion.tab-pane.active.cms-well
-              = react_component('CommentBox', author: current_user.full_name, url: pig.admin_content_package_comments_path(@content_package))
+              = "No comments"
