@@ -17,7 +17,7 @@ module Pig::ImageHelper
         url << "/#{options.delete(:text)}" if options[:text].present?
       end
     else
-      image_url = 'http://placehold.it/'.tap do |url|
+      image_url = 'https://via.placeholder.com/'.tap do |url|
         url << [width, height].compact.join('x')
         url << "&text=#{CGI.escape(options.delete(:text))}" if options[:text].present?
       end
