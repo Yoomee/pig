@@ -17,4 +17,4 @@
   =hidden_field_tag :return_to, params[:return_to] if params[:return_to]
   =form.actions do
     =form.action :submit, :label => 'Save', :button_html => {:class => 'btn btn-success pull-right'}
-    .btn=link_to('View all users', '/cms/cms_users')
+    .btn=link_to('View all users', '/admin/manage/users')
