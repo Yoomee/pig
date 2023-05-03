@@ -5,15 +5,15 @@ module Pig
     default from: Settings.site_noreply_email
 
     def assigned_for_review(content_package, assigned_to)
-      send_assigned_email(content_package, assigned_to)
+      # send_assigned_email(content_package, assigned_to) // Switched off email
     end
 
     def assigned_for_writing(content_package, assigned_to)
-      send_assigned_email(content_package, assigned_to)
+      #send_assigned_email(content_package, assigned_to) // Switched off email
     end
 
     def assigned_for_updating(content_package, assigned_to)
-      send_assigned_email(content_package, assigned_to)
+      #send_assigned_email(content_package, assigned_to) // Switched off email
     end
 
     def published(content_package, last_edited_by)
