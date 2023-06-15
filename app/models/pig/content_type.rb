@@ -45,6 +45,26 @@ module Pig
       name
     end
 
+    def dup_with_content_attributes(name)
+      cloned_content_type = self.dup
+      cloned_content_type.name = name
+      cloned_content_type.view_name = name.parameterize.underscore
+      cloned_content_type.package_name = name.downcase
+      
+      # Save the cloned_content_type first so it has an id
+      cloned_content_type.save!
+    
+      self.content_attributes.each do |content_attribute|
+        cloned_content_attribute = content_attribute.dup
+        # Set the content_type_id to the id of the cloned_content_type
+        cloned_content_attribute.content_type_id = cloned_content_type.id
+        # Save each cloned_content_attribute
+        cloned_content_attribute.save!
+      end
+    
+      cloned_content_type
+    end
+
     private
     def set_content_attribute_positions
       self.content_attributes.each_with_index do |content_attribute, idx|
