@@ -203,6 +203,6 @@
           .tab-content
             - if ga_code?
               #analytics.tab-pane.cms-well
-                = react_component('ContentPackageAnalytics', analyticsPath: pig.analytics_admin_content_package_path(@content_package), defaultPeriod: 7)
+                =@analytics_data
             #discussion.tab-pane.active.cms-well
               = "No comments"

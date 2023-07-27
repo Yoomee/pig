@@ -41,17 +41,6 @@ module Pig
       def children
       end
 
-      def analytics
-        begin
-          user = service_account_user
-          profile = user.accounts.first.profiles.first
-          analytics = Pig::Analytics.new(Visits.page_path(@content_package.permalink.full_path, profile).results(start_date: params[:period].to_i.days.ago))
-          render json: analytics.as_json
-        rescue
-          render json: { error: "Ooops, you haven't setup the Google analytics configuration properly. See the readme!" }, status: 500
-        end
-      end
-
       def edit
         get_view_data
       end
@@ -181,6 +170,7 @@ module Pig
         @non_meta_content_attributes = @content_package.content_attributes.where(:meta => false)
         @meta_content_attributes = @content_package.content_attributes.where(:meta => true)
         @changes_tab = params[:compare1] ? true : false
+        @analytics_data = analytics_data
       end
 
       def update_content_package
@@ -245,43 +235,60 @@ module Pig
         @content_package.last_edited_by = current_user
       end
 
-      def service_account_user(scope="https://www.googleapis.com/auth/analytics.readonly")
-        api_version = 'v3'
-        cached_api_file = "analytics-#{api_version}.cache"
+      def analytics_data
+        page_analytics = "test"
 
-        ## Read app credentials from a file
-        opts = YAML.load_file("ga_config.yml")
+        # Create a Google Analytics Reporting service
+        service = Google::Apis::AnalyticsreportingV4::AnalyticsReportingService.new
 
-        ## Update these to match your own apps credentials in the ga_config.yml file
-        service_account_email = opts['service_account_email']  # Email of service account
-        key_file = opts['key_file']                            # File containing your private key
-        key_secret = opts['key_secret']                        # Password to unlock private key
-        @profileID = opts['profileID'].to_s                    # Analytics profile ID.
+        # Create service account credentials
+        credentials = Google::Auth::ServiceAccountCredentials.make_creds(
+          json_key_io: File.open('service_account_cred.json'),
+          scope: 'https://www.googleapis.com/auth/analytics.readonly'
+        )
 
-        @client = Google::APIClient.new(
-        :application_name => opts['application_name'],
-        :application_version => opts['application_version'])
+        # Authorize with our readonly credentials
+        service.authorization = credentials
+        $google_client = service
 
-        ## Load our credentials for the service account
-        key = Google::APIClient::KeyUtils.load_from_pkcs12(key_file, key_secret)
+        page_analytics = get_analytics_data
 
-        @client.authorization = Signet::OAuth2::Client.new(
-        :token_credential_uri => 'https://accounts.google.com/o/oauth2/token',
-        :audience => 'https://accounts.google.com/o/oauth2/token',
-        :scope => 'https://www.googleapis.com/auth/analytics.readonly',
-        :issuer => service_account_email,
-        :signing_key => key)
-
-        ## Request a token for our service account
-        token = @client.authorization.fetch_access_token!
-
-        oauth_client = OAuth2::Client.new("", "", {
-          :authorize_url => 'https://accounts.google.com/o/oauth2/auth',
-          :token_url => 'https://accounts.google.com/o/oauth2/token'
-        })
-        token = OAuth2::AccessToken.new(oauth_client, token['access_token'], expires_in: 1.hour)
-        Legato::User.new(token)
+        return page_analytics
       end
+
+      def  get_analytics_data
+        # Set the date range - this is always required for report requests
+          date_range = Google::Apis::AnalyticsreportingV4::DateRange.new(
+            start_date: '2023-01-01',
+            end_date: '2023-12-12'
+          )
+          # Set the metric
+          metric =  Google::Apis::AnalyticsreportingV4::Metric.new(
+            expression: 'ga:sessions', alias: 'sessions'
+          )
+        
+          # Set the dimension
+          dimension = Google::Apis::AnalyticsreportingV4::Dimension.new(
+              name: 'ga:browser'
+            )
+
+          # Build up our report request and a add country filter
+          report_request = Google::Apis::AnalyticsreportingV4::ReportRequest.new(
+            view_id: '206879375',
+            filters_expression: "ga:country==United Kingdom",
+            date_ranges: [date_range],
+            metrics: [metric],
+            dimensions: [dimension]
+          )
+
+          # Create a new report request
+          request = Google::Apis::AnalyticsreportingV4::GetReportsRequest.new( report_requests: [report_request] )
+          # Make API call.
+          response = $google_client.batch_get_reports(request)
+
+          return response.inspect.to_s
+      end
+
     end
   end
 end
