@@ -170,7 +170,7 @@ module Pig
         @non_meta_content_attributes = @content_package.content_attributes.where(:meta => false)
         @meta_content_attributes = @content_package.content_attributes.where(:meta => true)
         @changes_tab = params[:compare1] ? true : false
-        @analytics_data = analytics_data
+        @analytics_data = analytics_data(@content_package)
       end
 
       def update_content_package
@@ -235,8 +235,12 @@ module Pig
         @content_package.last_edited_by = current_user
       end
 
-      def analytics_data
-        page_analytics = "test"
+      def analytics_data(page)
+
+          ## Read app credentials from a file
+          opts = YAML.load_file("ga_config.yml")
+          view_id = "ga:#{opts['view_id']}"
+          puts "DEBUG view_id: #{view_id}"
 
         # Create a Google Analytics Reporting service
         service = Google::Apis::AnalyticsreportingV4::AnalyticsReportingService.new
@@ -251,42 +255,68 @@ module Pig
         service.authorization = credentials
         $google_client = service
 
-        page_analytics = get_analytics_data
+        page_path = @content_package.permalink.full_path #TODO check this always works
+        today=Date.today
+        page_analytics = []
+
+        ##TODO CACHING!!!
+
+
+
+        # Call Google Analytics API for yesterday
+        start_date = "yesterday"
+        end_date = "today"
+        page_analytics << ["Yesterday", get_analytics_data(view_id, page_path, start_date, end_date)]
+
+        # Call Google Analytics API for 7 days ago
+        start_date = "7daysAgo"
+        end_date = "today"
+        page_analytics << ["Last 7 days", get_analytics_data(view_id, page_path, start_date, end_date)]
+
+        # Call Google Analytics API for last month
+        start_date = today - 30
+        page_analytics << ["Last month", get_analytics_data(view_id, page_path, start_date, end_date)]
+
+        # Call Google Analytics API for last year
+        start_date = today - 365
+        page_analytics << ["Last year", get_analytics_data(view_id, page_path, start_date, end_date)]
 
         return page_analytics
       end
 
-      def  get_analytics_data
+      def  get_analytics_data(view_id, page_path, start_date, end_date)
+
+        ##TODO CACHING!!!
+
         # Set the date range - this is always required for report requests
-          date_range = Google::Apis::AnalyticsreportingV4::DateRange.new(
-            start_date: '2023-01-01',
-            end_date: '2023-12-12'
-          )
-          # Set the metric
-          metric =  Google::Apis::AnalyticsreportingV4::Metric.new(
-            expression: 'ga:sessions', alias: 'sessions'
-          )
-        
-          # Set the dimension
-          dimension = Google::Apis::AnalyticsreportingV4::Dimension.new(
-              name: 'ga:browser'
-            )
+        date_range = Google::Apis::AnalyticsreportingV4::DateRange.new(
+          start_date: "#{start_date}",
+          end_date: "#{end_date}"
+        )
+        # Set the metrics
+        page_views =  Google::Apis::AnalyticsreportingV4::Metric.new(expression: 'ga:uniquePageviews')
+        avg_time_on_page =  Google::Apis::AnalyticsreportingV4::Metric.new(expression: 'ga:avgTimeOnPage')
+        exits =  Google::Apis::AnalyticsreportingV4::Metric.new(expression: 'ga:exits')
 
-          # Build up our report request and a add country filter
-          report_request = Google::Apis::AnalyticsreportingV4::ReportRequest.new(
-            view_id: '206879375',
-            filters_expression: "ga:country==United Kingdom",
-            date_ranges: [date_range],
-            metrics: [metric],
-            dimensions: [dimension]
+        # Set the dimension
+        dimension = Google::Apis::AnalyticsreportingV4::Dimension.new(
+            name: 'ga:pagePath'
           )
 
-          # Create a new report request
-          request = Google::Apis::AnalyticsreportingV4::GetReportsRequest.new( report_requests: [report_request] )
-          # Make API call.
-          response = $google_client.batch_get_reports(request)
+        # Build up our report request and a add country filter
+        report_request = Google::Apis::AnalyticsreportingV4::ReportRequest.new(
+          view_id: "#{view_id}",
+          filters_expression: "ga:PagePath==#{page_path}",
+          date_ranges: [date_range],
+          metrics: [page_views, avg_time_on_page, exits],
+          dimensions: [dimension]
+        )
 
-          return response.inspect.to_s
+        # Create a new report request
+        request = Google::Apis::AnalyticsreportingV4::GetReportsRequest.new( report_requests: [report_request] )
+        # Make API call.
+        response = $google_client.batch_get_reports(request)
+        return response.reports.last.data.totals[0].values
       end
 
     end

@@ -203,6 +203,6 @@
           .tab-content
             - if ga_code?
               #analytics.tab-pane.cms-well
-                =@analytics_data
+                =@analytics_data.inspect
             #discussion.tab-pane.active.cms-well
               = "No comments"
