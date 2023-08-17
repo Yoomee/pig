@@ -213,7 +213,7 @@
                     %span#upv-7days=number_with_delimiter(@analytics_data[1][1][0])
                     %br/
                     %strong Last Month:
-                    %span#upv-lastmonths=umber_with_delimiter(@analytics_data[2][1][0])
+                    %span#upv-lastmonths=@analytics_data[2][1][0]
                     %br/
                     %strong Last Year:
                     %span#upv-lastyears=number_with_delimiter(number_with_delimiter(@analytics_data[3][1][0]))
@@ -254,8 +254,6 @@
                     ="DEVELOPER DEBUG:"
                     %br/
                     -if @current_user.id == 13 # TODO remove debug info for developer account
-                      =@page_path
-                      %br/
                       =@analytics_data.inspect
 
             #discussion.tab-pane.active.cms-well
