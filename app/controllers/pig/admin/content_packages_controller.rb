@@ -170,8 +170,10 @@ module Pig
         @non_meta_content_attributes = @content_package.content_attributes.where(:meta => false)
         @meta_content_attributes = @content_package.content_attributes.where(:meta => true)
         @changes_tab = params[:compare1] ? true : false
-        @analytics_data = analytics_data(@content_package)
-        @page_path = get_ga_page_path
+        cache_key = "analytics_data_#{@content_package.id}_#{Date.today}"
+        Rails.cache.fetch(cache_key, expires_in: 2.hours) do
+          @analytics_data = analytics_data(@content_package)
+        end
       end
 
       def get_ga_page_path
@@ -242,10 +244,9 @@ module Pig
 
       def analytics_data(page)
 
-          ## Read app credentials from a file
-          opts = YAML.load_file("ga_config.yml")
-          view_id = "ga:#{opts['view_id']}"
-          puts "DEBUG view_id: #{view_id}"
+        ## Read app credentials from a file
+        opts = YAML.load_file("ga_config.yml")
+        view_id = "ga:#{opts['view_id']}"
 
         # Create a Google Analytics Reporting service
         service = Google::Apis::AnalyticsreportingV4::AnalyticsReportingService.new
@@ -263,8 +264,6 @@ module Pig
         page_path = get_ga_page_path
         today=Date.today
         page_analytics = []
-
-        ##TODO CACHING!!!
 
         # Call Google Analytics API for yesterday
         start_date = "yesterday"
@@ -284,12 +283,13 @@ module Pig
         start_date = today - 365
         page_analytics << ["Last year", get_analytics_data(view_id, page_path, start_date, end_date)]
 
+        # Store debug info
+        page_analytics << ["Debug info", [Time.now.utc, get_ga_page_path]]
+
         return page_analytics
       end
 
       def  get_analytics_data(view_id, page_path, start_date, end_date)
-
-        ##TODO CACHING!!!
 
         # Set the date range - this is always required for report requests
         date_range = Google::Apis::AnalyticsreportingV4::DateRange.new(
