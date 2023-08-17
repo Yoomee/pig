@@ -203,6 +203,58 @@
           .tab-content
             - if ga_code?
               #analytics.tab-pane.cms-well
-                =@analytics_data.inspect
+                .metrics-section
+                  .metric
+                    %label.col-primary Unique Page Views
+                    %strong Yesterday:
+                    %span#upv-yesterday=number_with_delimiter(@analytics_data[0][1][0])
+                    %br/
+                    %strong Last 7 Days:
+                    %span#upv-7days=number_with_delimiter(@analytics_data[1][1][0])
+                    %br/
+                    %strong Last Month:
+                    %span#upv-lastmonths=@analytics_data[2][1][0]
+                    %br/
+                    %strong Last Year:
+                    %span#upv-lastyears=number_with_delimiter(number_with_delimiter(@analytics_data[3][1][0]))
+                    %br/
+                    %br/
+
+                  .metric
+                    %label.col-primary Average Time on Page
+                    %strong Yesterday:
+                    %span#atop-yesterday=seconds_to_display(@analytics_data[0][1][1])
+                    %br/
+                    %strong Last 7 Days:
+                    %span#atop-7days=seconds_to_display(@analytics_data[1][1][1])
+                    %br/
+                    %strong Last Month:
+                    %span#atop-lastmonth=seconds_to_display(@analytics_data[2][1][1])
+                    %br/
+                    %strong Last Year:
+                    %span#atop-lastyear=seconds_to_display(@analytics_data[3][1][1])
+                    %br/
+                    %br/
+
+                  .metric
+                    %label.col-primary Number of Exits
+                    %strong Yesterday:
+                    %span#atop-yesterday=number_with_delimiter(@analytics_data[0][1][2])
+                    %br/
+                    %strong Last 7 Days:
+                    %span#atop-7days=number_with_delimiter(@analytics_data[1][1][2])
+                    %br/
+                    %strong Last Month:
+                    %span#atop-lastmonth=number_with_delimiter(@analytics_data[2][1][2])
+                    %br/
+                    %strong Last Year:
+                    %span#atop-lastyear=number_with_delimiter(@analytics_data[3][1][2])
+                    %br/
+                    %br/
+                    ="DEVELOPER DEBUG:"
+                    %br/
+                    -if @current_user.id == 13 # TODO remove debug info for developer account
+                      =@analytics_data.inspect
+
             #discussion.tab-pane.active.cms-well
               = "No comments"

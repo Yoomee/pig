@@ -72,6 +72,13 @@ module Pig
 
     end
 
+    def seconds_to_display(seconds)
+      seconds = seconds.to_i
+      minutes = seconds / 60
+      remaining_seconds = seconds % 60
+      "#{minutes}m #{remaining_seconds}s"
+    end
+
     private
 
     def get_content_package_title
