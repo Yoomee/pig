@@ -170,10 +170,7 @@ module Pig
         @non_meta_content_attributes = @content_package.content_attributes.where(:meta => false)
         @meta_content_attributes = @content_package.content_attributes.where(:meta => true)
         @changes_tab = params[:compare1] ? true : false
-        cache_key = "analytics_data_#{@content_package.id}_#{Date.today}"
-        Rails.cache.fetch(cache_key, expires_in: 2.hours) do
-          @analytics_data = analytics_data(@content_package)
-        end
+        @analytics_data = analytics_data(@content_package)
       end
 
       def get_ga_page_path
@@ -243,49 +240,51 @@ module Pig
       end
 
       def analytics_data(page)
+        cache_key = "analytics_data_#{@content_package.id}_#{Date.today}"
+        Rails.cache.fetch(cache_key, expires_in: 2.hours) do
 
-        ## Read app credentials from a file
-        opts = YAML.load_file("ga_config.yml")
-        view_id = "ga:#{opts['view_id']}"
+          ## Read app credentials from a file
+          opts = YAML.load_file("ga_config.yml")
+          view_id = "ga:#{opts['view_id']}"
 
-        # Create a Google Analytics Reporting service
-        service = Google::Apis::AnalyticsreportingV4::AnalyticsReportingService.new
+          # Create a Google Analytics Reporting service
+          service = Google::Apis::AnalyticsreportingV4::AnalyticsReportingService.new
 
-        # Create service account credentials
-        credentials = Google::Auth::ServiceAccountCredentials.make_creds(
-          scope: 'https://www.googleapis.com/auth/analytics.readonly'
-        )
+          # Create service account credentials
+          credentials = Google::Auth::ServiceAccountCredentials.make_creds(
+            scope: 'https://www.googleapis.com/auth/analytics.readonly'
+          )
 
-        # Authorize with our readonly credentials
-        service.authorization = credentials
-        $google_client = service
+          # Authorize with our readonly credentials
+          service.authorization = credentials
+          $google_client = service
 
-        page_path = get_ga_page_path
-        today=Date.today
-        page_analytics = []
+          page_path = get_ga_page_path
+          today=Date.today
+          page_analytics = []
 
-        # Call Google Analytics API for yesterday
-        start_date = "yesterday"
-        end_date = "today"
-        page_analytics << ["Yesterday", get_analytics_data(view_id, page_path, start_date, end_date)]
+          # Call Google Analytics API for yesterday
+          start_date = "yesterday"
+          end_date = "today"
+          page_analytics << ["Yesterday", get_analytics_data(view_id, page_path, start_date, end_date)]
 
-        # Call Google Analytics API for 7 days ago
-        start_date = "7daysAgo"
-        end_date = "today"
-        page_analytics << ["Last 7 days", get_analytics_data(view_id, page_path, start_date, end_date)]
+          # Call Google Analytics API for 7 days ago
+          start_date = "7daysAgo"
+          end_date = "today"
+          page_analytics << ["Last 7 days", get_analytics_data(view_id, page_path, start_date, end_date)]
 
-        # Call Google Analytics API for last month
-        start_date = today - 30
-        page_analytics << ["Last month", get_analytics_data(view_id, page_path, start_date, end_date)]
+          # Call Google Analytics API for last month
+          start_date = today - 30
+          page_analytics << ["Last month", get_analytics_data(view_id, page_path, start_date, end_date)]
 
-        # Call Google Analytics API for last year
-        start_date = today - 365
-        page_analytics << ["Last year", get_analytics_data(view_id, page_path, start_date, end_date)]
+          # Call Google Analytics API for last year
+          start_date = today - 365
+          page_analytics << ["Last year", get_analytics_data(view_id, page_path, start_date, end_date)]
 
-        # Store debug info
-        page_analytics << ["Debug info", [Time.now.utc, get_ga_page_path]]
+          # Store debug info
+          page_analytics << ["Debug info", [Time.now.utc, get_ga_page_path]]
 
-        return page_analytics
+        end
       end
 
       def  get_analytics_data(view_id, page_path, start_date, end_date)
