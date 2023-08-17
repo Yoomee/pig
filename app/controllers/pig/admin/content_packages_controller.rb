@@ -260,13 +260,11 @@ module Pig
         service.authorization = credentials
         $google_client = service
 
-        page_path = get_ga_page_path #TODO check this always works
+        page_path = get_ga_page_path
         today=Date.today
         page_analytics = []
 
         ##TODO CACHING!!!
-
-
 
         # Call Google Analytics API for yesterday
         start_date = "yesterday"
