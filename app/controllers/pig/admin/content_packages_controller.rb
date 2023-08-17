@@ -253,7 +253,6 @@ module Pig
 
         # Create service account credentials
         credentials = Google::Auth::ServiceAccountCredentials.make_creds(
-          json_key_io: File.open('service_account_cred.json'),
           scope: 'https://www.googleapis.com/auth/analytics.readonly'
         )
 
