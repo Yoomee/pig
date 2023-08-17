@@ -171,6 +171,11 @@ module Pig
         @meta_content_attributes = @content_package.content_attributes.where(:meta => true)
         @changes_tab = params[:compare1] ? true : false
         @analytics_data = analytics_data(@content_package)
+        @page_path = get_ga_page_path
+      end
+
+      def get_ga_page_path
+        @content_package.permalink_full_path.nil? ? "/" :  @content_package.permalink_full_path 
       end
 
       def update_content_package
@@ -255,7 +260,7 @@ module Pig
         service.authorization = credentials
         $google_client = service
 
-        page_path = @content_package.permalink.full_path #TODO check this always works
+        page_path = get_ga_page_path #TODO check this always works
         today=Date.today
         page_analytics = []
 
