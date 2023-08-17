@@ -255,14 +255,6 @@
                   .metric
                     %label.col-primary ANALYTICS CACHED
                     %span=@analytics_data[4][1][0].strftime("%a %d %b %H:%M:%S")
-                    -if @current_user.id == 13 # TODO remove debug info for developer account
-                      %br/
-                      %br/
-                      ="DEVELOPER DEBUG:"
-                      %br/
-                      ="Path: #{@analytics_data[4][1][1]}"
-                      %br/
-                      =@analytics_data.inspect
 
             #discussion.tab-pane.active.cms-well
               = "No comments"
