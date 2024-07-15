@@ -313,6 +313,9 @@ module Pig
           dimensions: [dimension]
         )
 
+        # Skip creating a new report TODO
+        return []
+
         # Create a new report request
         request = Google::Apis::AnalyticsreportingV4::GetReportsRequest.new( report_requests: [report_request] )
         # Make API call.
