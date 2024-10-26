@@ -1,3 +1,5 @@
+include ActionView::Helpers::CaptureHelper
+
 module Pig::LayoutHelper
 
   def body_tag(options = {}, &block)
