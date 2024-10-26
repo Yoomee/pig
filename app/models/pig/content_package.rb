@@ -81,6 +81,10 @@ module Pig
 
     end
 
+    def taxonomy_from(category)
+      taggings.where(context: 'taxonomy').map { |tagging| tagging.tag.name }.to_a
+    end
+
     class << self
 
       def member_routes
