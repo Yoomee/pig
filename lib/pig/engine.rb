@@ -7,7 +7,6 @@ module Pig
       # This ensures that we are targeting the engine's helpers directory
       helpers_path = config.root.join('app', 'helpers', 'pig', '**', '*.rb')
       Dir.glob(helpers_path).each do |file|
-        puts "DEBUG: require_dependency(#{file})" # For debugging purposes
         require_dependency file
       end
     end
