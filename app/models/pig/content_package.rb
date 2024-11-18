@@ -112,7 +112,7 @@ module Pig
         routes | resourceful_routes
       end
 
-      def search(term)
+      def pig_search(term)
         escaped_term = "%#{term}%"
         joins(:permalink).where(archived_at: nil).where("name LIKE ? OR pig_permalinks.path LIKE ?", escaped_term, escaped_term)
       end
