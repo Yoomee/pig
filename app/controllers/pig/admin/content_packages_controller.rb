@@ -149,6 +149,7 @@ module Pig
       end
 
       def update
+        puts "DEBUG: entered update"
         get_view_data
         update_content_package
       end
@@ -165,6 +166,7 @@ module Pig
       end
 
       def get_view_data
+        puts "DEBUG: entered get_view_data"
         @persona_groups = Pig::PersonaGroup.all.includes(:personas)
         @activity_items = @content_package.activity_items.includes(:user, :resource).paginate(:page => 1, :per_page => 5)
         @non_meta_content_attributes = @content_package.content_attributes.where(:meta => false)
@@ -178,6 +180,8 @@ module Pig
       end
 
       def update_content_package
+        puts "DEBUG: entered update_content_package"
+
         # Because of the way pig uses method missing to update each content chunk just using
         # touch: true on the association would result in an update on the content package for every chunk
         # Because of this the updated_at time is set here
@@ -190,6 +194,8 @@ module Pig
         #If permalink changed, don't pass the parameter to update attributes but update aliases here
         if @content_package.permalink && !content_package_params[:permalink_path].nil? && (content_package_params[:permalink_path] != @content_package.permalink.path)
 
+          puts "DEBUG: A"
+
           new_permalink_path = content_package_params[:permalink_path]
           old_permalink =  @content_package.permalinks.active.first
 
@@ -201,8 +207,10 @@ module Pig
 
           # Save new permalink (or update an old version of it)
           if @content_package.parent
+            puts "DEBUG: B"
             new_permalink_full_path = @content_package.parent.permalink_display_path.chop + "/" + new_permalink_path
           else
+            puts "DEBUG: C"
             new_permalink_full_path = "/" + new_permalink_path
           end
           new_permalink = Permalink.find_or_initialize_by(full_path: new_permalink_full_path)
@@ -213,22 +221,38 @@ module Pig
             full_path:  new_permalink_full_path)
         end
 
+        puts "DEBUG: Attributes before update: #{@content_package.attributes.inspect}"
+        puts "DEBUG: Attributes to update: #{content_package_params.inspect}"
+
+        if @content_package.changed?
+          puts "DEBUG: Changes detected: #{@content_package.changes.inspect}"
+        else
+          puts "DEBUG: No changes detected."
+        end
+
+        puts "DEBUG: Current parent_id: #{@content_package.parent_id}"
+        puts "DEBUG: New parent_id: #{content_package_params[:parent_id]}"
 
         if @content_package.update(content_package_params)
+          puts "DEBUG: D"
           flash[:notice] = "Updated \"#{@content_package}\""
           if @content_package.status == 'published' && previous_status != 'published'
             @content_package.published_at = DateTime.now
             @content_package.save
           end
           if params[:view]
+            puts "DEBUG: E"
             redirect_to pig.content_package_path(@content_package)
           elsif params[:preview]
+            puts "DEBUG: F"
             redirect_to pig.preview_admin_content_package_path(@content_package)
           else
+            puts "DEBUG: G"
             redirect_to pig.edit_admin_content_package_path(@content_package)
           end
         else
           #TODO change to flash[:error] when the style has been made
+          puts "DEBUG: H"
           flash[:notice] = "Sorry there was a problem saving this page: #{@content_package.errors.full_messages.to_sentence}"
           render :action => 'edit'
         end

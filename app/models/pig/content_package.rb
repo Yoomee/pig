@@ -15,17 +15,19 @@ module Pig
 
     belongs_to :content_type
     has_and_belongs_to_many :personas, class_name: 'Pig::Persona'
-    belongs_to :author, class_name: 'Pig::User'
-    belongs_to :last_edited_by, class_name: 'Pig::User'
-    belongs_to :requested_by, class_name: 'Pig::User'
+    belongs_to :author, class_name: 'Pig::User', optional: true
+    belongs_to :last_edited_by, class_name: 'Pig::User', optional: true
+    belongs_to :requested_by, class_name: 'Pig::User', optional: true
     has_many :archived_children, -> { where("archived_at IS NOT NULL").order(:position, :id) }, :class_name => "ContentPackage", :foreign_key => 'parent_id'
 
     before_create :set_meta_title
 
-    validates :name, :content_type, :requested_by, :next_review, :presence => true
+    validates :name, :content_type, :next_review, :presence => true
     validate :required_attributes
     validate :lineage
     validate :validate_content_chunks
+
+    validate :associated_users_exist
 
     delegate :content_attributes, :package_name, :view_name, :missing_view?, :viewless?, :to => :content_type
 
@@ -223,6 +225,48 @@ module Pig
       permalink.save
     end
 
+    # Class method to identify missing user associations
+    def self.show_missing_user_associations
+      # Query the ContentPackage table for relevant IDs
+      select(:id, :author_id, :last_edited_by_id, :requested_by_id).map do |content_package|
+        # Initialize a hash to store missing associations for the current content package
+        missing_ids = {}
+
+        # Check each association for missing users
+        [:author_id, :last_edited_by_id, :requested_by_id].each do |association|
+          user_id = content_package[association] # Get the user_id for the current association
+          next if user_id.nil? # Skip if the association is nil (no user assigned)
+          
+          # Check if the user_id exists in the Pig::User table
+          unless Pig::User.exists?(user_id)
+            missing_ids[association] = user_id # Add to missing_ids if the user does not exist
+          end
+        end
+
+        # If there are any missing associations, return a hash with details
+        { content_package_id: content_package.id, missing_ids: missing_ids } unless missing_ids.empty?
+      end.compact # Remove nil entries (content packages with no missing associations)
+    end
+
+    # Class method to identify and replace missing user associations
+    def self.fix_missing_user_associations(replacement_user_id = 15)
+      # Query the ContentPackage table for relevant IDs
+      select(:id, :author_id, :last_edited_by_id, :requested_by_id).each do |content_package|
+        # Check each association for missing users
+        [:author_id, :last_edited_by_id, :requested_by_id].each do |association|
+          user_id = content_package[association] # Get the user_id for the current association
+          next if user_id.nil? # Skip if the association is nil (no user assigned)
+          
+          # If the user does not exist, replace the ID with the replacement_user_id
+          unless Pig::User.exists?(user_id)
+            content_package.update_column(association, replacement_user_id)
+            puts "Updated ContentPackage ID #{content_package.id}: Set #{association} to #{replacement_user_id}"
+          end
+        end
+      end
+    end
+
+
     private
 
     def lineage
@@ -291,5 +335,19 @@ module Pig
       return [] if content_type.nil?
       (json_content["content_chunks"].try(:keys) || []) & content_attributes.pluck(:slug)
     end
+
+    def associated_users_exist
+      { author: author_id, last_edited_by: last_edited_by_id, requested_by: requested_by_id }.each do |association, user_id|
+        if user_id.present?
+          unless Pig::User.exists?(user_id)
+            errors.add(association, "must reference an existing user")
+          end
+        else
+          puts "DEBUG: Skipping validation for missing user on ContentPackage id: #{id}, association: #{association}, name: #{name}"
+        end
+      end
+    end
+
   end
+
 end
